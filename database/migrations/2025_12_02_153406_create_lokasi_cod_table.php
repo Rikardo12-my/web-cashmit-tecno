@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('lokasi_cod', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->text('deskripsi')->nullable();
-            $table->string('latitude')->nullable();
-            $table->string('longitude')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->string('nama_lokasi');                   
+            $table->string('area_detail')->nullable();       
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->boolean('status')->default(true);        
             $table->timestamps();
         });
     }

@@ -13,13 +13,20 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
+            $table->string('key')->unique();
+            $table->text('value')->nullable();
+            $table->enum('type', [
+                'string',
+                'number',
+                'boolean',
+                'json',
+                'text'
+            ])->default('string');
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('settings');
