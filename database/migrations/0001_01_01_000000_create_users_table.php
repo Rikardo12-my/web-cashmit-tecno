@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('nim_nip')->unique();
             $table->string('foto')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->enum('role', ['mahasiswa', 'admin', 'petugas'])->default('mahasiswa');
+            $table->enum('role', ['customer', 'admin', 'petugas'])->default('customer');
+            $table->enum('status', ['verify', 'active', 'banned']);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
