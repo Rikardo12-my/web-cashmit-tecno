@@ -26,12 +26,12 @@
   <!-- summernote -->
   <link rel="stylesheet" href="{{asset('adminlte/plugins/summernote/summernote-bs4.min.css')}}">
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body >
 <div class="wrapper">
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="{{asset('adminlte/dist/img/CASHMITLogo.png')}}" alt="CashmitLogo" height="60" width="60">
+    <img class="animation__shake" src="{{asset('adminlte/dist/img/LogoCashMit.png')}}" alt="CashmitLogo" height="60" width="60">
   </div>
 
   <!-- Navbar -->
@@ -44,12 +44,21 @@
   <!-- Content Wrapper. Contains page content -->
 @yield('content')
   <!-- /.content-wrapper -->
-  <footer class="main-footer">
-    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
-    All rights reserved.
-    <div class="float-right d-none d-sm-inline-block">
-      <b>Version</b> 3.2.0
-    </div>
+  <footer class="main-footer flex flex-col sm:flex-row justify-between items-center sm:items-baseline space-y-2 sm:space-y-0">
+    <div class="mb-2 md:mb-0">
+            <span class="font-semibold text-indigo-600">CASHMIT</span> 
+            <span class="text-gray-400">© {{ date('Y') }}</span>
+            <span class="hidden sm:inline">— Solusi Tarik Tunai Digital Mahasiswa</span>
+        </div>
+    <div class="flex items-center space-x-4">
+            <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-medium">
+                Campus Fintech
+            </span>
+
+            <span class="text-xs text-gray-400">
+                v1.0.0
+            </span>
+        </div>
   </footer>
 
   <!-- Control Sidebar -->

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TarikTunai;
+
 class PaymentMethod extends Model
 {
     use HasFactory;
@@ -16,21 +17,30 @@ class PaymentMethod extends Model
         'kategori',
         'is_active',
         'deskripsi',
+        'qris_image',
+        'account_name',
+        'account_number',
+        'provider',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELASI
-    |--------------------------------------------------------------------------
-    */
-
-    // Satu payment method dapat digunakan pada banyak transaksi tarik tunai
     public function tarikTunai()
     {
         return $this->hasMany(TarikTunai::class, 'payment_method_id');
+    }
+
+    public function isQris()
+    {
+        return in_array($this->kategori, ['bank_qris', 'qris_cod']);
+    }
+
+    public function qrisImageUrl()
+    {
+        return $this->qris_image
+            ? asset('storage/' . $this->qris_image)
+            : null;
     }
 }
