@@ -716,10 +716,8 @@
                 <form id="deleteForm" method="POST" class="d-inline">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="btn btn-danger btn-delete" 
-                            data-id="{{ $payment->id }}"
-                            data-nama="{{ $payment->nama }}">
-                        <i class="fas fa-trash"></i>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash mr-1"></i> Ya, Hapus
                     </button>
                 </form>
             </div>
