@@ -49,14 +49,26 @@
               <i class="nav-icon fas fa-users"></i>
             </div>
             <div class="nav-content">
-              <p class="nav-text">Manajemen User</p>
+              <p class="nav-text">Manajemen Customer</p>
               <i class="nav-arrow fas fa-chevron-right"></i>
             </div>
           </a>
         </li>
         
         <li class="nav-item">
-          <a href="#" class="nav-link {{(request()->is('#')) ? 'active' : ''}}">
+          <a href="petugas" class="nav-link {{(request()->is('petugas')) ? 'active' : ''}}">
+            <div class="nav-icon-wrapper">
+              <i class="nav-icon fas fa-users"></i>
+            </div>
+            <div class="nav-content">
+              <p class="nav-text">Manajemen Petugas</p>
+              <i class="nav-arrow fas fa-chevron-right"></i>
+            </div>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="{{ route('admin.tariktunai.index') }}" class="nav-link {{ request()->routeIs('admin.tariktunai.*') ? 'active' : '' }}">
             <div class="nav-icon-wrapper">
               <i class="nav-icon fas fa-money-bill-alt"></i>
             </div>

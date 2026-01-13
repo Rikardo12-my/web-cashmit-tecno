@@ -130,4 +130,5 @@ class UserManagementController extends Controller
 
         return redirect()->back()->with('success', 'Role user berhasil diupdate');
     }
+
 }

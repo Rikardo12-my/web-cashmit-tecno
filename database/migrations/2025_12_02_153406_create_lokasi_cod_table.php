@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('area_detail')->nullable();       
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
+            $table->string('gambar')->nullable(); // Tambah kolom gambar
             $table->boolean('status')->default(true);        
             $table->timestamps();
         });

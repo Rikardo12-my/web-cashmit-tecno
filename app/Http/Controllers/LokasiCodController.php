@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LokasiCod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class LokasiCodController extends Controller
 {
@@ -13,8 +14,6 @@ class LokasiCodController extends Controller
     public function index()
     {
         $lokasi = LokasiCod::orderBy('status', 'desc')->get();
-
-        // Statistik berdasarkan banyaknya transaksi tarik tunai
         $statistik = LokasiCod::withCount('tarikTunai')
             ->orderBy('tarik_tunai_count', 'desc')
             ->take(5)
@@ -33,21 +32,29 @@ class LokasiCodController extends Controller
             'area_detail' => 'nullable|string|max:255',
             'latitude'    => 'nullable|numeric',
             'longitude'   => 'nullable|numeric',
+            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        LokasiCod::create([
+        $data = [
             'nama_lokasi' => $request->nama_lokasi,
             'area_detail' => $request->area_detail,
             'latitude'    => $request->latitude,
             'longitude'   => $request->longitude,
             'status'      => true,
-        ]);
+        ];
 
-        return redirect()->back()->with('success', 'Lokasi COD berhasil ditambahkan!');
+        // Upload gambar jika ada
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('lokasi-cod', 'public');
+        }
+
+        LokasiCod::create($data);
+
+        return back()->with('success', 'Lokasi COD berhasil ditambahkan!');
     }
 
     /**
-     * Edit lokasi COD.
+     * Update lokasi COD.
      */
     public function update(Request $request, $id)
     {
@@ -58,29 +65,98 @@ class LokasiCodController extends Controller
             'area_detail' => 'nullable|string|max:255',
             'latitude'    => 'nullable|numeric',
             'longitude'   => 'nullable|numeric',
+            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $lokasi->update([
+        $data = [
             'nama_lokasi' => $request->nama_lokasi,
             'area_detail' => $request->area_detail,
             'latitude'    => $request->latitude,
             'longitude'   => $request->longitude,
-        ]);
+        ];
 
-        return redirect()->back()->with('success', 'Lokasi COD berhasil diperbarui!');
+        // Update gambar jika ada file baru
+        if ($request->hasFile('gambar')) {
+            // Hapus gambar lama jika ada
+            if ($lokasi->gambar && Storage::disk('public')->exists($lokasi->gambar)) {
+                Storage::disk('public')->delete($lokasi->gambar);
+            }
+            
+            $data['gambar'] = $request->file('gambar')->store('lokasi-cod', 'public');
+        }
+
+        $lokasi->update($data);
+
+        return back()->with('success', 'Lokasi COD berhasil diperbarui!');
     }
 
     /**
-     * Mengaktifkan atau menonaktifkan lokasi COD.
+     * Hapus gambar lokasi COD.
+     */
+    public function hapusGambar($id)
+    {
+        $lokasi = LokasiCod::findOrFail($id);
+
+        if ($lokasi->gambar && Storage::disk('public')->exists($lokasi->gambar)) {
+            Storage::disk('public')->delete($lokasi->gambar);
+            
+            $lokasi->update(['gambar' => null]);
+            
+            return back()->with('success', 'Gambar berhasil dihapus!');
+        }
+
+        return back()->with('error', 'Tidak ada gambar untuk dihapus!');
+    }
+
+    /**
+     * Aktif / Nonaktif lokasi COD.
      */
     public function toggleStatus($id)
     {
         $lokasi = LokasiCod::findOrFail($id);
+        $lokasi->update([
+            'status' => !$lokasi->status
+        ]);
 
-        $lokasi->status = !$lokasi->status;
-        $lokasi->save();
+        return back()->with('success', 'Status lokasi COD berhasil diperbarui!');
+    }
 
-        return redirect()->back()->with('success', 'Status lokasi COD berhasil diperbarui!');
+    /**
+     * Hapus lokasi COD.
+     */
+    public function destroy(Request $request, $id)
+    {
+        try {
+            $lokasi = LokasiCod::findOrFail($id);
+            
+            // Hapus file gambar jika ada
+            if ($lokasi->gambar && Storage::disk('public')->exists($lokasi->gambar)) {
+                Storage::disk('public')->delete($lokasi->gambar);
+            }
+            
+            $lokasi->delete();
+            
+            // Check if request is AJAX
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Lokasi COD berhasil dihapus!'
+                ]);
+            }
+            
+            return redirect()->route('admin.lokasi.index')
+                ->with('success', 'Lokasi COD berhasil dihapus!');
+                
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus lokasi COD: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return back()->with('error', 'Gagal menghapus lokasi COD: ' . $e->getMessage());
+        }
     }
 
     /**

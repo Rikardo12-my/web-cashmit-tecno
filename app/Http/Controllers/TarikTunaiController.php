@@ -357,4 +357,26 @@ class TarikTunaiController extends Controller
         
         return response()->json(['locations' => []]);
     }
+    public function batchStatusUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'transaction_ids' => 'required|array',
+            'transaction_ids.*' => 'exists:tarik_tunais,id',
+            'status' => 'required|in:diproses,menunggu_petugas,dalam_perjalanan,selesai,dibatalkan',
+            'catatan_admin' => 'nullable|string|max:500',
+        ]);
+
+        $count = TarikTunai::whereIn('id', $validated['transaction_ids'])
+            ->update([
+                'status' => $validated['status'],
+                'catatan_admin' => $validated['catatan_admin'] ?? null,
+                'waktu_diserahkan' => $validated['status'] == 'selesai' ? now() : null
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Status berhasil diperbarui untuk {$count} transaksi",
+            'count' => $count
+        ]);
+    }
 }
