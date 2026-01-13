@@ -25,6 +25,11 @@ Route::get('/login', function () {
 
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+
+Route::post('/register', [AuthController::class, 'register']);
 // Protected Routes (Require Authentication)
 Route::middleware(['auth'])->group(function () {
     // Logout
@@ -94,3 +99,4 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 });
+

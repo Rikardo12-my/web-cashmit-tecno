@@ -274,36 +274,36 @@
                                             <td class="align-middle">
                                                 <div class="d-flex align-items-center">
                                                     @if($item->gambar)
-                                                        @php
-                                                            $imageUrl = Storage::url($item->gambar);
-                                                            $imageExists = Storage::disk('public')->exists($item->gambar);
-                                                        @endphp
-                                                        
-                                                        @if($imageExists)
-                                                            <div class="position-relative">
-                                                                <img src="{{ $imageUrl }}" 
-                                                                     alt="{{ $item->nama_lokasi }}"
-                                                                     class="img-thumbnail rounded-lg shadow-sm"
-                                                                     style="width: 60px; height: 60px; object-fit: cover;"
-                                                                     onclick="showImageModal('{{ $imageUrl }}')">
-                                                                
-                                                                <span class="badge badge-light position-absolute" style="top: -5px; right: -5px; font-size: 8px;">
-                                                                    <i class="fas fa-image text-info"></i>
-                                                                </span>
-                                                            </div>
-                                                        @else
-                                                            <div class="image-error-placeholder rounded-lg d-flex flex-column align-items-center justify-content-center text-center"
-                                                                 style="width: 60px; height: 60px; background: linear-gradient(45deg, #ffeaa7, #fab1a0); border: 2px dashed #e17055;"
-                                                                 title="Gambar tidak ditemukan di server">
-                                                                <i class="fas fa-exclamation-circle text-danger mb-1"></i>
-                                                                <small class="text-danger" style="font-size: 8px;">Error</small>
-                                                            </div>
-                                                        @endif
+                                                    @php
+                                                    $imageUrl = Storage::url($item->gambar);
+                                                    $imageExists = Storage::disk('public')->exists($item->gambar);
+                                                    @endphp
+
+                                                    @if($imageExists)
+                                                    <div class="position-relative">
+                                                        <img src="{{ $imageUrl }}"
+                                                            alt="{{ $item->nama_lokasi }}"
+                                                            class="img-thumbnail rounded-lg shadow-sm"
+                                                            style="width: 60px; height: 60px; object-fit: cover;"
+                                                            onclick="showImageModal('{{ $imageUrl }}')">
+
+                                                        <span class="badge badge-light position-absolute" style="top: -5px; right: -5px; font-size: 8px;">
+                                                            <i class="fas fa-image text-info"></i>
+                                                        </span>
+                                                    </div>
                                                     @else
-                                                        <div class="image-placeholder rounded-lg d-flex align-items-center justify-content-center"
-                                                             style="width: 60px; height: 60px; background: linear-gradient(45deg, #dfe6e9, #b2bec3);">
-                                                            <i class="fas fa-image text-muted"></i>
-                                                        </div>
+                                                    <div class="image-error-placeholder rounded-lg d-flex flex-column align-items-center justify-content-center text-center"
+                                                        style="width: 60px; height: 60px; background: linear-gradient(45deg, #ffeaa7, #fab1a0); border: 2px dashed #e17055;"
+                                                        title="Gambar tidak ditemukan di server">
+                                                        <i class="fas fa-exclamation-circle text-danger mb-1"></i>
+                                                        <small class="text-danger" style="font-size: 8px;">Error</small>
+                                                    </div>
+                                                    @endif
+                                                    @else
+                                                    <div class="image-placeholder rounded-lg d-flex align-items-center justify-content-center"
+                                                        style="width: 60px; height: 60px; background: linear-gradient(45deg, #dfe6e9, #b2bec3);">
+                                                        <i class="fas fa-image text-muted"></i>
+                                                    </div>
                                                     @endif
                                                 </div>
                                             </td>
@@ -1241,73 +1241,73 @@
         });
 
         // Edit Location Modal
-$('.btn-edit').click(function() {
-    const id = $(this).data('id');
-    const nama = $(this).data('nama');
-    const area = $(this).data('area');
-    const lat = $(this).data('lat');
-    const lng = $(this).data('lng');
-    const gambar = $(this).data('gambar');
+        $('.btn-edit').click(function() {
+            const id = $(this).data('id');
+            const nama = $(this).data('nama');
+            const area = $(this).data('area');
+            const lat = $(this).data('lat');
+            const lng = $(this).data('lng');
+            const gambar = $(this).data('gambar');
 
-    $('#edit_nama_lokasi').val(nama);
-    $('#edit_area_detail').val(area || '');
-    $('#edit_latitude').val(lat || '');
-    $('#edit_longitude').val(lng || '');
+            $('#edit_nama_lokasi').val(nama);
+            $('#edit_area_detail').val(area || '');
+            $('#edit_latitude').val(lat || '');
+            $('#edit_longitude').val(lng || '');
 
-    // Handle gambar - FIX THIS:
-    if (gambar) {
-        const imageUrl = '{{ Storage::url("") }}' + gambar; // Fix the image URL
-        $('#currentImage').attr('src', imageUrl);
-        $('#currentImageContainer').show();
-    } else {
-        $('#currentImageContainer').hide();
-    }
+            // Handle gambar - FIX THIS:
+            if (gambar) {
+                const imageUrl = '{{ Storage::url("") }}' + gambar; // Fix the image URL
+                $('#currentImage').attr('src', imageUrl);
+                $('#currentImageContainer').show();
+            } else {
+                $('#currentImageContainer').hide();
+            }
 
-    // FIX: Use Laravel's route helper or correct URL
-    $('#editForm').attr('action', '{{ route("admin.lokasi.update", ["id" => ":id"]) }}'.replace(':id', id));
-    $('#editModal').modal('show');
-});
+            // FIX: Use Laravel's route helper or correct URL
+            $('#editForm').attr('action', '{{ route("admin.lokasi.update", ["id" => ":id"]) }}'.replace(':id', id));
+            $('#editModal').modal('show');
+        });
 
         // Toggle Status - FIX THIS
-$('.btn-toggle-status').click(function() {
-    const id = $(this).data('id');
-    const button = $(this);
+        $('.btn-toggle-status').click(function() {
+            const id = $(this).data('id');
+            const button = $(this);
 
-    Swal.fire({
-        title: 'Konfirmasi',
-        text: 'Apakah Anda yakin ingin mengubah status lokasi ini?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#667eea',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, ubah status!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            button.addClass('btn-loading');
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Apakah Anda yakin ingin mengubah status lokasi ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#667eea',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, ubah status!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.addClass('btn-loading');
 
-            // FIX: Use correct route
-            $.ajax({
-                url: '{{ route("admin.lokasi.toggle-status", ["id" => ":id"]) }}'.replace(':id', id),
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    _method: 'PUT'
-                },
-                success: function(response) {
-                    showNotification('success', response.message || 'Status berhasil diubah');
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1500);
-                },
-                error: function(xhr) {
-                    button.removeClass('btn-loading');
-                    showNotification('error', 'Terjadi kesalahan saat mengubah status');
+                    // FIX: Use correct route
+                    $.ajax({
+                        url: '{{ route("admin.lokasi.toggle-status", ["id" => ":id"]) }}'.replace(':id', id),
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            _method: 'PUT'
+                        },
+                        success: function(response) {
+                            showNotification('success', response.message || 'Status berhasil diubah');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
+                        },
+                        error: function(xhr) {
+                            button.removeClass('btn-loading');
+                            showNotification('error', 'Terjadi kesalahan saat mengubah status');
+                        }
+                    });
                 }
             });
-        }
-    });
-});
+        });
 
         // Delete Location
         $('.btn-delete').click(function() {
@@ -1320,40 +1320,40 @@ $('.btn-toggle-status').click(function() {
         });
 
         // Delete Form Submission - FIX THIS
-$('#deleteForm').on('submit', function(e) {
-    e.preventDefault();
-    const form = $(this);
-    const url = form.attr('action');
-    const button = form.find('button[type="submit"]');
+        $('#deleteForm').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const url = form.attr('action');
+            const button = form.find('button[type="submit"]');
 
-    button.prop('disabled', true).addClass('btn-loading');
+            button.prop('disabled', true).addClass('btn-loading');
 
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: {
-            _token: '{{ csrf_token() }}',
-            _method: 'DELETE'
-        },
-        success: function(response) {
-            $('#deleteModal').modal('hide');
-            showNotification('success', response.message || 'Lokasi berhasil dihapus');
-            setTimeout(function() {
-                location.reload();
-            }, 1500);
-        },
-        error: function(xhr) {
-            button.prop('disabled', false).removeClass('btn-loading');
-            $('#deleteModal').modal('hide');
-            
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                showNotification('error', xhr.responseJSON.message);
-            } else {
-                showNotification('error', 'Terjadi kesalahan saat menghapus lokasi');
-            }
-        }
-    });
-});
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    _method: 'DELETE'
+                },
+                success: function(response) {
+                    $('#deleteModal').modal('hide');
+                    showNotification('success', response.message || 'Lokasi berhasil dihapus');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                },
+                error: function(xhr) {
+                    button.prop('disabled', false).removeClass('btn-loading');
+                    $('#deleteModal').modal('hide');
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        showNotification('error', xhr.responseJSON.message);
+                    } else {
+                        showNotification('error', 'Terjadi kesalahan saat menghapus lokasi');
+                    }
+                }
+            });
+        });
 
         // Table Search
         $('#searchTable').on('keyup', function() {
