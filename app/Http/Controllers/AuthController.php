@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -17,25 +18,17 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
         if(Auth::attempt($request->only('email', 'password'),$request->remember)){
-            if(Auth::user()->role == 'customer'){
-                return redirect('customer');
+            if(Auth::user()->role == 'petugas')return redirect('/petugas');
+            if(Auth::user()->role =='customer')return redirect('/customer');
+                return redirect('/dashboard');
             }
-            return redirect()->intended('dashboard');
-        }
-        return back()->withErrors([
-            'email' => 'Email atau password salah',
-        ])->onlyInput('email');
+            return back()->with('failed','Login gagal, silahkan periksa kembali email dan password anda!');
     }
-    public function showRegisterForm()
-    {
-        return view('auth.register'); // Ganti dengan nama view register Anda
-    }
-
     public function register(Request $request)
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'nim_nip' => 'required|string|max:20|unique:users',
+            'nim_nip' => 'nullable|string|max:20|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'telepon' => 'required|string|max:15',
             'tanggal_lahir' => 'required|date',
@@ -45,32 +38,49 @@ class AuthController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        // Handle file upload
         $fotoPath = null;
         if ($request->hasFile('foto')) {
             $fotoPath = $request->file('foto')->store('profile-photos', 'public');
         }
 
-        // Create user with automatic role 'customer'
-        $user = User::create([
-            'nama' => $validated['nama'],
-            'nim_nip' => $validated['nim_nip'],
-            'email' => $validated['email'],
-            'telepon' => $validated['telepon'],
-            'tanggal_lahir' => $validated['tanggal_lahir'],
-            'alamat' => $validated['alamat'],
-            'role' => 'customer', // Otomatis customer
-            'status' => 'verify', // Default status untuk user baru
-            'password' => Hash::make($validated['password']),
-            'foto' => $fotoPath,
-        ]);
+        $data = $validated;
+        $data['password'] = bcrypt($validated['password']);
+        $data['status'] = 'verify';
+        $data['foto'] = $fotoPath;
 
-        return redirect('/login')->with('success', 'Registration successful! Your account is pending verification.');
+        $user = User::create($data);
+
+        Auth::login($user);
+
+        return redirect('/verify');
+    }
+    
+    public function google_redirect()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function google_callback()
+    {
+       $googleUser = Socialite::driver('google')->user();
+       $user = User::where('email', $googleUser->email)->first();
+       if(!$user){
+        $user = User::create([
+            'nama' => $googleUser->name,
+            'email' => $googleUser->email,
+            'status' => 'active',
+        ]);
+       }
+       if($user && $user->status =='banned'){
+        return redirect('/login')->with('failed','Akun Anda diblokir. Silakan hubungi admin.');
+       }
+       Auth::login($user);
+       if($user->role =='customer') return redirect('/customer');
     }
 
     public function logout()
     {
-        Auth::logout();
+        Auth::logout(Auth::user());
         return redirect('/login');
     }
 }

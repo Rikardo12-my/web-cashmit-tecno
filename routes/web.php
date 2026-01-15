@@ -3,41 +3,39 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LokasiCodController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\LokasiCodController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\TarikTunaiController;
+use App\Http\Controllers\VerificationController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// Public Routes
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('welcome');
 });
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
+//untuk login
+Route::get('/login', fn() => view('auth.login'))->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
-
+//untuk register
+Route::get('/register', fn() => view('auth.register'))->name('register');
 Route::post('/register', [AuthController::class, 'register']);
-// Protected Routes (Require Authentication)
-Route::middleware(['auth'])->group(function () {
-    // Logout
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Dashboard
+//untuk google auth
+Route::get('/auth-google-redirect',[AuthController::class, 'google_redirect']);
+Route::get('/auth-google-callback',[AuthController::class, 'google_callback']);
+
+//untuk verifikasi akun
+Route::group(['middleware' => ['auth','check_role:customer']], function () {
+    Route::get('/verify', [VerificationController::class, 'index']);
+    Route::post('/verify', [VerificationController::class, 'store']);
+    Route::get('/verify/{unique_id}', [VerificationController::class, 'show']);
+    Route::put('/verify/{unique_id}', [VerificationController::class, 'update']);
+});
+
+// Admin Routes dengan middleware check_role:admin
+Route::group(['middleware' => ['auth', 'check_role:admin']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     // Redirect customers to admin/users/customers
     Route::redirect('/customers', '/admin/users/customers')->name('customers');
 
@@ -64,14 +62,15 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/statistik', [LokasiCodController::class, 'statistik'])->name('statistik');
         });
 
-        // Payment Methods - PERBAIKAN DI SINI
+        // Payment Methods
         Route::prefix('payment')->name('payment.')->group(function () {
             Route::get('/', [PaymentMethodController::class, 'index'])->name('index');
             Route::post('/', [PaymentMethodController::class, 'store'])->name('store');
             Route::put('/{id}', [PaymentMethodController::class, 'update'])->name('update');
-            Route::put('/toggle-status/{id}', [PaymentMethodController::class, 'toggleStatus'])->name('toggle-status'); // PERBAIKI TYPO
+            Route::put('/toggle-status/{id}', [PaymentMethodController::class, 'toggleStatus'])->name('toggle-status');
             Route::delete('/{id}', [PaymentMethodController::class, 'destroy'])->name('destroy');
         });
+
         // Tarik Tunai Routes
         Route::prefix('tarik-tunai')->name('tariktunai.')->group(function () {
             // Main Routes
@@ -99,4 +98,15 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 });
+//route yang hanya bisa diakses oleh petugas
+Route::group(['middleware' => ['auth', 'check_role:petugas']], function () {
 
+});
+//route yang hanya bisa diakses oleh customer
+Route::group(['middleware' => ['auth', 'check_role:customer', 'check_status']], function () {
+
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+});

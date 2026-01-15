@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('verifications', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('unique_id');
+            $table->string('otp_id');
+            $table->enum('type',['register','reset_password']);
+            $table->enum('send_via',['email','sms','wa']);
+            $table->integer('resend')->default(0);
+            $table->enum('status',['active','valid','invalid']);
+            
             $table->timestamps();
         });
     }

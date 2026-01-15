@@ -12,8 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'user_akses' => \App\Http\Middleware\UserAkses::class,
+            'check_role' => \App\Http\Middleware\CheckRole::class,
+            'check_status' => \App\Http\Middleware\CheckStatus::class,
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
