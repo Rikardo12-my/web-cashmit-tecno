@@ -44,7 +44,7 @@
         </li>
         
         <li class="nav-item">
-          <a href="customers" class="nav-link {{(request()->is('customers')) ? 'active' : ''}}">
+          <a href="{{ route('admin.customer.index') }}" class="nav-link {{(request()->routeIs('admin.customer.*')) ? 'active' : ''}}">
             <div class="nav-icon-wrapper">
               <i class="nav-icon fas fa-users"></i>
             </div>
@@ -56,7 +56,7 @@
         </li>
         
         <li class="nav-item">
-          <a href="petugas" class="nav-link {{(request()->is('petugas')) ? 'active' : ''}}">
+          <a href="{{ route('admin.petugas.index') }}" class="nav-link {{(request()->routeIs('admin.petugas.*')) ? 'active' : ''}}">
             <div class="nav-icon-wrapper">
               <i class="nav-icon fas fa-users"></i>
             </div>

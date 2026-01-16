@@ -6,12 +6,15 @@
     <title>{{ config('app.name') }}</title>
 </head>
 <body>
-    <h2>Your One-Time Password (OTP)</h2>
-    <p>Your OTP is: <strong>{{ $otp_id }}</strong></p>
-    <p>Please use this OTP to complete your verification process. This OTP is valid for a limited time only.</p>
-    <p>If you did not request this OTP, please ignore this email.</p>
-    <br>
-    <p>Thank you,</p>
-    <p>{{ config('app.name') }} Team</p>
+    <div style="max-width: 600px; margin: auto; padding: 20px; font-family: Arial, sans-serif; border: 1px solid #ddd; border-radius: 5px;">
+        <h2 style="text-align: center; color: #333;">{{ config('app.name') }}</h2>
+        <p style="font-size: 16px; color: #555;">Hello,</p>
+        <p style="font-size: 16px; color: #555;">Your One-Time Password (OTP) is:</p>
+        <h1 style="text-align: center; color: #000; font-size: 32px; margin: 20px 0;">{{ $otp_id }}</h1>
+        <p style="font-size: 16px; color: #555;">This OTP is valid for the next 10 minutes. Please do not share it with anyone.</p>
+        <p style="font-size: 16px; color: #555;">If you did not request this OTP, please ignore this email.</p>
+        <br>
+        <p style="font-size: 16px; color: #555;">Best regards,<br>{{ config('app.name') }} Team</p>
+    </div>
 </body>
 </html>

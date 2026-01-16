@@ -10,29 +10,54 @@ return new class extends Migration
     {
         Schema::create('tarik_tunais', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('petugas_id')->nullable();
+
+            $table->string('kode_transaksi')->unique();
+
+            $table->unsignedBigInteger('user_id');        // customer
+            $table->unsignedBigInteger('petugas_id')->nullable(); // petugas lapangan
+            $table->unsignedBigInteger('assigned_by')->nullable(); // admin yang assign
+
             $table->unsignedBigInteger('jumlah');
-            $table->unsignedBigInteger('payment_method_id')->nullable(); // UBAH INI
+            $table->unsignedBigInteger('biaya_admin')->default(0);
+            $table->unsignedBigInteger('total_dibayar')->nullable();
+
+            $table->unsignedBigInteger('payment_method_id')->nullable();
             $table->unsignedBigInteger('lokasi_cod_id')->nullable();
+
             $table->string('bukti_bayar_customer')->nullable();
             $table->string('bukti_serah_terima_petugas')->nullable();
+
+            $table->timestamp('waktu_diproses')->nullable();
+            $table->timestamp('waktu_dalam_perjalanan')->nullable();
             $table->timestamp('waktu_diserahkan')->nullable();
+            $table->timestamp('waktu_selesai')->nullable();
+            $table->timestamp('waktu_dibatalkan')->nullable();
+
             $table->enum('status', [
-                'pending',     
-                'diproses',     
-                'menunggu_petugas', 
-                'dalam_perjalanan', 
-                'selesai',      
+                'pending',              
+                'menunggu_admin',       
+                'diproses',             
+                'dalam_perjalanan',    
+                'menunggu_serah_terima',
+                'selesai',
                 'dibatalkan'
             ])->default('pending');
+
             $table->text('catatan_admin')->nullable();
+            $table->text('catatan_petugas')->nullable();
+            $table->text('catatan_customer')->nullable();
+
             $table->timestamps();
 
-            // RELASI
+            // =============================
+            // FOREIGN KEY
+            // =============================
+
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('petugas_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('set null'); // UBAH INI
+            $table->foreign('assigned_by')->references('id')->on('users')->onDelete('set null');
+
+            $table->foreign('payment_method_id')->references('id')->on('payment_methods')->onDelete('set null');
             $table->foreign('lokasi_cod_id')->references('id')->on('lokasi_cod')->onDelete('set null');
         });
     }

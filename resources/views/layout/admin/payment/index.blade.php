@@ -150,12 +150,14 @@
                                     </div>
                                 </div>
 
-                                <!-- QRIS & Bank Fields -->
-                                <div id="qrisFields" style="display: '{{ old('kategori') == 'bank_qris' || old('kategori') == 'qris_cod' ? 'block' : 'none' }}';">
+                                <!-- QRIS & Bank & E-Wallet Fields -->
+                                <div id="qrisFields" style="display: none;">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="account_name">Nama Pemilik Rekening</label>
+                                                <label for="account_name" id="account_name_label">
+                                                    Nama Pemilik Rekening
+                                                </label>
                                                 <input type="text" class="form-control @error('account_name') is-invalid @enderror" 
                                                        id="account_name" name="account_name" 
                                                        placeholder="Nama pemilik rekening/akun"
@@ -169,7 +171,9 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="account_number">Nomor Rekening/QRIS</label>
+                                                <label for="account_number" id="account_number_label">
+                                                    Nomor Rekening/QRIS
+                                                </label>
                                                 <input type="text" class="form-control @error('account_number') is-invalid @enderror" 
                                                        id="account_number" name="account_number" 
                                                        placeholder="Nomor rekening/QRIS"
@@ -185,7 +189,9 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="provider">Provider/Bank</label>
+                                                <label for="provider" id="provider_label">
+                                                    Provider/Bank
+                                                </label>
                                                 <input type="text" class="form-control @error('provider') is-invalid @enderror" 
                                                        id="provider" name="provider" 
                                                        placeholder="Contoh: BCA, BRI, OVO, Gopay"
@@ -199,24 +205,29 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="qris_image">Gambar QRIS</label>
+                                                <label for="qris_image" id="qris_image_label">Gambar QRIS/Logo</label>
                                                 <div class="custom-file">
                                                     <input type="file" class="custom-file-input @error('qris_image') is-invalid @enderror" 
                                                            id="qris_image" name="qris_image" 
                                                            accept="image/png,image/jpeg,image/jpg"
                                                            onchange="previewImage(this, 'qrisPreview')">
-                                                    <label class="custom-file-label" for="qris_image">Pilih file QRIS...</label>
+                                                    <label class="custom-file-label" for="qris_image">Pilih file QRIS/Logo...</label>
                                                 </div>
                                                 @error('qris_image')
                                                     <span class="invalid-feedback d-block" role="alert">
                                                         <strong>{{ $message }}</strong>
                                                     </span>
                                                 @enderror
-                                                <small class="text-muted">Format: PNG, JPG, JPEG (Maks 2MB)</small>
+                                                <small class="text-muted" id="qris_help_text">
+                                                    Format: PNG, JPG, JPEG (Maks 2MB)
+                                                    <span id="ewallet_hint" style="display: none;">
+                                                        <br>Untuk E-Wallet: Upload logo/screenshot aplikasi
+                                                    </span>
+                                                </small>
                                                 
                                                 <!-- Image Preview -->
                                                 <div class="mt-2" id="qrisPreviewContainer" style="display: none;">
-                                                    <img id="qrisPreview" src="" alt="Preview QRIS" class="img-thumbnail" style="max-height: 150px;">
+                                                    <img id="qrisPreview" src="" alt="Preview QRIS/Logo" class="img-thumbnail" style="max-height: 150px;">
                                                     <button type="button" class="btn btn-sm btn-danger mt-1" onclick="removeImage('qrisPreview')">
                                                         <i class="fas fa-times mr-1"></i> Hapus
                                                     </button>
@@ -278,7 +289,7 @@
                                             <th style="width: 20%">Nama Metode</th>
                                             <th style="width: 15%">Kategori</th>
                                             <th style="width: 25%">Informasi</th>
-                                            <th style="width: 15%">QRIS</th>
+                                            <th style="width: 15%">QRIS/Logo</th>
                                             <th style="width: 10%">Status</th>
                                             <th style="width: 10%">Aksi</th>
                                         </tr>
@@ -323,13 +334,21 @@
                                                     @endif
                                                     @if($payment->account_name)
                                                         <div class="mb-1">
-                                                            <i class="fas fa-user text-success mr-1"></i>
+                                                            @if($payment->kategori == 'e_wallet')
+                                                                <i class="fas fa-user-tie text-info mr-1"></i>
+                                                            @else
+                                                                <i class="fas fa-user text-success mr-1"></i>
+                                                            @endif
                                                             <small>{{ $payment->account_name }}</small>
                                                         </div>
                                                     @endif
                                                     @if($payment->account_number)
                                                         <div class="mb-1">
-                                                            <i class="fas fa-hashtag text-info mr-1"></i>
+                                                            @if($payment->kategori == 'e_wallet')
+                                                                <i class="fas fa-mobile-alt text-warning mr-1"></i>
+                                                            @else
+                                                                <i class="fas fa-hashtag text-info mr-1"></i>
+                                                            @endif
                                                             <small>{{ $payment->account_number }}</small>
                                                         </div>
                                                     @endif
@@ -347,12 +366,12 @@
                                                 @if($payment->qris_image)
                                                     <div class="d-flex flex-column align-items-center">
                                                         <img src="{{ asset('storage/' . $payment->qris_image) }}" 
-                                                             alt="QRIS {{ $payment->nama }}" 
+                                                             alt="{{ $payment->kategori == 'e_wallet' ? 'Logo' : 'QRIS' }} {{ $payment->nama }}" 
                                                              class="img-thumbnail mb-1" 
                                                              style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
-                                                             onclick="viewQRIS('{{ asset('storage/' . $payment->qris_image) }}', '{{ $payment->nama }}')">
+                                                             onclick="viewQRIS('{{ asset('storage/' . $payment->qris_image) }}', '{{ $payment->nama }}', '{{ $payment->kategori }}')">
                                                         <button type="button" class="btn btn-sm btn-outline-info btn-sm" 
-                                                                onclick="viewQRIS('{{ asset('storage/' . $payment->qris_image) }}', '{{ $payment->nama }}')">
+                                                                onclick="viewQRIS('{{ asset('storage/' . $payment->qris_image) }}', '{{ $payment->nama }}', '{{ $payment->kategori }}')">
                                                             <i class="fas fa-eye mr-1"></i> Lihat
                                                         </button>
                                                     </div>
@@ -422,92 +441,91 @@
                 <!-- Right Column: Statistics & Info -->
                 <div class="col-lg-4">
                     <!-- Categories Distribution -->
-                <!-- Ganti seluruh bagian card dengan ini -->
-<div class="card card-gradient-indigo card-outline">
-    <div class="card-header">
-        <h3 class="card-title">
-            <i class="fas fa-chart-pie mr-2"></i>
-            Distribusi Kategori
-        </h3>
-    </div>
-    <div class="card-body">
-        @php
-            $categories = [
-                'bank_qris' => [
-                    'count' => $payments->where('kategori', 'bank_qris')->count(),
-                    'label' => 'Bank/QRIS',
-                    'color' => 'primary',
-                    'icon' => 'fa-university'
-                ],
-                'qris_cod' => [
-                    'count' => $payments->where('kategori', 'qris_cod')->count(),
-                    'label' => 'QRIS COD',
-                    'color' => 'success',
-                    'icon' => 'fa-qrcode'
-                ],
-                'e_wallet' => [
-                    'count' => $payments->where('kategori', 'e_wallet')->count(),
-                    'label' => 'E-Wallet',
-                    'color' => 'warning',
-                    'icon' => 'fa-wallet'
-                ],
-            ];
-            $totalCount = $payments->count();
-        @endphp
-        
-        <div class="row text-center mb-4">
-            @foreach($categories as $key => $cat)
-            @php
-                $percentage = $totalCount > 0 ? round(($cat['count'] / $totalCount) * 100) : 0;
-            @endphp
-            <div class="col-4">
-                <div class="d-flex flex-column align-items-center">
-                    <div class="rounded-circle bg-{{ $cat['color'] }} p-3 mb-2">
-                        <i class="fas {{ $cat['icon'] }} fa-2x text-white"></i>
+                    <div class="card card-gradient-indigo card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-pie mr-2"></i>
+                                Distribusi Kategori
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            @php
+                                $categories = [
+                                    'bank_qris' => [
+                                        'count' => $payments->where('kategori', 'bank_qris')->count(),
+                                        'label' => 'Bank/QRIS',
+                                        'color' => 'primary',
+                                        'icon' => 'fa-university'
+                                    ],
+                                    'qris_cod' => [
+                                        'count' => $payments->where('kategori', 'qris_cod')->count(),
+                                        'label' => 'QRIS COD',
+                                        'color' => 'success',
+                                        'icon' => 'fa-qrcode'
+                                    ],
+                                    'e_wallet' => [
+                                        'count' => $payments->where('kategori', 'e_wallet')->count(),
+                                        'label' => 'E-Wallet',
+                                        'color' => 'warning',
+                                        'icon' => 'fa-wallet'
+                                    ],
+                                ];
+                                $totalCount = $payments->count();
+                            @endphp
+                            
+                            <div class="row text-center mb-4">
+                                @foreach($categories as $key => $cat)
+                                @php
+                                    $percentage = $totalCount > 0 ? round(($cat['count'] / $totalCount) * 100) : 0;
+                                @endphp
+                                <div class="col-4">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <div class="rounded-circle bg-{{ $cat['color'] }} p-3 mb-2">
+                                            <i class="fas {{ $cat['icon'] }} fa-2x text-white"></i>
+                                        </div>
+                                        <h4 class="mb-1">{{ $cat['count'] }}</h4>
+                                        <small class="text-muted">{{ $cat['label'] }}</small>
+                                        <span class="badge bg-{{ $cat['color'] }} mt-1">{{ $percentage }}%</span>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            
+                            <div class="mt-3">
+                                @foreach($categories as $key => $cat)
+                                @php
+                                    $percentage = $totalCount > 0 ? round(($cat['count'] / $totalCount) * 100) : 0;
+                                @endphp
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>
+                                            <i class="fas {{ $cat['icon'] }} text-{{ $cat['color'] }} mr-2"></i>
+                                            {{ $cat['label'] }}
+                                        </span>
+                                        <span class="font-weight-bold">{{ $cat['count'] }} ({{ $percentage }}%)</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-{{ $cat['color'] }} progress-bar-striped" 
+                                             role="progressbar" 
+                                             style="width: {{ $percentage }}%"
+                                             aria-valuenow="{{ $percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            
+                            @if($totalCount === 0)
+                            <div class="text-center py-4">
+                                <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Belum ada data</h5>
+                                <p class="text-muted">Tambahkan metode pembayaran untuk melihat distribusi kategori</p>
+                            </div>
+                            @endif
+                        </div>
                     </div>
-                    <h4 class="mb-1">{{ $cat['count'] }}</h4>
-                    <small class="text-muted">{{ $cat['label'] }}</small>
-                    <span class="badge bg-{{ $cat['color'] }} mt-1">{{ $percentage }}%</span>
-                </div>
-            </div>
-            @endforeach
-        </div>
-        
-        <div class="mt-3">
-            @foreach($categories as $key => $cat)
-            @php
-                $percentage = $totalCount > 0 ? round(($cat['count'] / $totalCount) * 100) : 0;
-            @endphp
-            <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                    <span>
-                        <i class="fas {{ $cat['icon'] }} text-{{ $cat['color'] }} mr-2"></i>
-                        {{ $cat['label'] }}
-                    </span>
-                    <span class="font-weight-bold">{{ $cat['count'] }} ({{ $percentage }}%)</span>
-                </div>
-                <div class="progress" style="height: 10px;">
-                    <div class="progress-bar bg-{{ $cat['color'] }} progress-bar-striped" 
-                         role="progressbar" 
-                         style="width: {{ $percentage }}%"
-                         aria-valuenow="{{ $percentage }}" 
-                         aria-valuemin="0" 
-                         aria-valuemax="100">
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-        
-        @if($totalCount === 0)
-        <div class="text-center py-4">
-            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
-            <h5 class="text-muted">Belum ada data</h5>
-            <p class="text-muted">Tambahkan metode pembayaran untuk melihat distribusi kategori</p>
-        </div>
-        @endif
-    </div>
-</div>
 
                     <!-- Quick Stats -->
                     <div class="card card-success card-outline">
@@ -543,7 +561,7 @@
                                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                     <span>
                                         <i class="fas fa-qrcode text-info mr-2"></i>
-                                        Dengan QRIS
+                                        Dengan QRIS/Logo
                                     </span>
                                     <span class="badge bg-info badge-pill">{{ $payments->whereNotNull('qris_image')->count() }}</span>
                                 </li>
@@ -556,14 +574,14 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-qrcode mr-2"></i>
-                                Preview QRIS
+                                Preview QRIS/Logo
                             </h3>
                         </div>
                         <div class="card-body text-center">
                             <div id="qrisViewContainer">
                                 <p class="text-muted mb-0">
                                     <i class="fas fa-info-circle mr-1"></i>
-                                    Klik "Lihat" pada tabel untuk melihat QRIS
+                                    Klik "Lihat" pada tabel untuk melihat QRIS/Logo
                                 </p>
                             </div>
                         </div>
@@ -604,19 +622,23 @@
                         </select>
                     </div>
 
-                    <!-- QRIS & Bank Fields -->
+                    <!-- QRIS & Bank & E-Wallet Fields -->
                     <div id="editQrisFields" style="display: none;">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="edit_account_name">Nama Pemilik Rekening</label>
+                                    <label for="edit_account_name" id="edit_account_name_label">
+                                        Nama Pemilik Rekening
+                                    </label>
                                     <input type="text" class="form-control" 
                                            id="edit_account_name" name="account_name">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="edit_account_number">Nomor Rekening/QRIS</label>
+                                    <label for="edit_account_number" id="edit_account_number_label">
+                                        Nomor Rekening/QRIS
+                                    </label>
                                     <input type="text" class="form-control" 
                                            id="edit_account_number" name="account_number">
                                 </div>
@@ -625,14 +647,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="edit_provider">Provider/Bank</label>
+                                    <label for="edit_provider" id="edit_provider_label">
+                                        Provider/Bank
+                                    </label>
                                     <input type="text" class="form-control" 
                                            id="edit_provider" name="provider">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="edit_qris_image">Gambar QRIS Baru</label>
+                                    <label for="edit_qris_image" id="edit_qris_image_label">Gambar QRIS/Logo Baru</label>
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" 
                                                id="edit_qris_image" name="qris_image" 
@@ -640,16 +664,21 @@
                                                onchange="previewImage(this, 'editQrisPreview')">
                                         <label class="custom-file-label" for="edit_qris_image">Pilih file baru...</label>
                                     </div>
-                                    <small class="text-muted">Kosongkan jika tidak ingin mengubah</small>
+                                    <small class="text-muted" id="edit_qris_help_text">
+                                        Kosongkan jika tidak ingin mengubah
+                                        <span id="edit_ewallet_hint" style="display: none;">
+                                            <br>Untuk E-Wallet: Upload logo/screenshot aplikasi
+                                        </span>
+                                    </small>
                                     
                                     <!-- Current QRIS Preview -->
                                     <div id="currentQrisContainer" class="mt-2">
-                                        <p class="mb-1"><small>QRIS Saat Ini:</small></p>
+                                        <p class="mb-1"><small>QRIS/Logo Saat Ini:</small></p>
                                         <img id="currentQrisImage" src="" alt="Current QRIS" 
                                              class="img-thumbnail" style="max-height: 100px;">
                                         <div class="mt-1">
                                             <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCurrentQRIS()">
-                                                <i class="fas fa-trash mr-1"></i> Hapus QRIS
+                                                <i class="fas fa-trash mr-1"></i> Hapus QRIS/Logo
                                             </button>
                                             <input type="hidden" id="remove_qris" name="remove_qris" value="0">
                                         </div>
@@ -657,7 +686,7 @@
                                     
                                     <!-- New QRIS Preview -->
                                     <div class="mt-2" id="editQrisPreviewContainer" style="display: none;">
-                                        <p class="mb-1"><small>Preview QRIS Baru:</small></p>
+                                        <p class="mb-1"><small>Preview QRIS/Logo Baru:</small></p>
                                         <img id="editQrisPreview" src="" alt="New QRIS Preview" 
                                              class="img-thumbnail" style="max-height: 100px;">
                                         <button type="button" class="btn btn-sm btn-danger mt-1" onclick="removeImage('editQrisPreview')">
@@ -684,6 +713,7 @@
         </div>
     </div>
 </div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -724,20 +754,21 @@
         </div>
     </div>
 </div>
+
 <!-- QRIS View Modal -->
 <div class="modal fade" id="qrisModal" tabindex="-1" role="dialog" aria-labelledby="qrisModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header bg-info">
                 <h5 class="modal-title" id="qrisModalLabel">
-                    <i class="fas fa-qrcode mr-2"></i> QRIS
+                    <i class="fas fa-qrcode mr-2"></i> <span id="modalTitlePrefix"></span>
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body text-center">
-                <img id="modalQrisImage" src="" alt="QRIS" class="img-fluid mb-3" style="max-height: 250px;">
+                <img id="modalQrisImage" src="" alt="QRIS/Logo" class="img-fluid mb-3" style="max-height: 250px;">
                 <h6 id="modalQrisTitle" class="mb-0"></h6>
             </div>
             <div class="modal-footer justify-content-center">
@@ -931,35 +962,111 @@ $(document).ready(function() {
     // Initialize custom file input
     bsCustomFileInput.init();
     
-    // Toggle QRIS fields based on category in add form
+    // Toggle QRIS/E-Wallet fields based on category in add form
     window.toggleQrisFields = function() {
         const kategori = $('#kategori').val();
         const qrisFields = $('#qrisFields');
+        const ewalletHint = $('#ewallet_hint');
         
-        if (kategori === 'bank_qris' || kategori === 'qris_cod') {
+        if (kategori === 'bank_qris' || kategori === 'qris_cod' || kategori === 'e_wallet') {
             qrisFields.slideDown(300);
-            // Make QRIS fields required
-            $('#account_name, #account_number, #provider').prop('required', true);
+            
+            // Update labels and placeholders based on category
+            if (kategori === 'e_wallet') {
+                // Untuk E-Wallet
+                $('#account_name_label').text('Nama Pemilik Akun');
+                $('#account_number_label').text('Nomor Telepon/ID E-Wallet');
+                $('#provider_label').text('Nama E-Wallet');
+                $('#qris_image_label').text('Logo/Screenshot E-Wallet');
+                
+                // Update placeholders
+                $('#account_name').attr('placeholder', 'Nama pemilik akun e-wallet');
+                $('#account_number').attr('placeholder', 'Nomor HP/ID e-wallet (contoh: 0812xxx)');
+                $('#provider').attr('placeholder', 'Contoh: OVO, Gopay, Dana, dll');
+                $('#qris_image').next('.custom-file-label').text('Pilih file logo/screenshot...');
+                
+                // Show E-Wallet hint
+                ewalletHint.show();
+                
+                // Optional fields for E-Wallet
+                $('#account_name, #account_number, #provider').prop('required', true);
+                $('#qris_image').prop('required', false);
+            } else {
+                // Untuk Bank/QRIS & QRIS COD
+                $('#account_name_label').text('Nama Pemilik Rekening');
+                $('#account_number_label').text('Nomor Rekening/QRIS');
+                $('#provider_label').text('Provider/Bank');
+                $('#qris_image_label').text('Gambar QRIS');
+                
+                // Update placeholders
+                $('#account_name').attr('placeholder', 'Nama pemilik rekening/akun');
+                $('#account_number').attr('placeholder', 'Nomor rekening/QRIS');
+                $('#provider').attr('placeholder', 'Contoh: BCA, BRI, Mandiri, dll');
+                $('#qris_image').next('.custom-file-label').text('Pilih file QRIS...');
+                
+                // Hide E-Wallet hint
+                ewalletHint.hide();
+                
+                // Make QRIS fields required
+                $('#account_name, #account_number, #provider').prop('required', true);
+                $('#qris_image').prop('required', false); // Optional untuk edit
+            }
         } else {
             qrisFields.slideUp(300);
-            // Remove required from QRIS fields
+            // Remove required from fields
             $('#account_name, #account_number, #provider').prop('required', false);
         }
     }
     
-    // Initialize based on old input
-    toggleQrisFields();
-
-    // Toggle QRIS fields in edit modal
+    // Toggle QRIS/E-Wallet fields in edit modal
     window.toggleEditQrisFields = function() {
         const kategori = $('#edit_kategori').val();
         const qrisFields = $('#editQrisFields');
+        const ewalletHint = $('#edit_ewallet_hint');
         
-        if (kategori === 'bank_qris' || kategori === 'qris_cod') {
+        if (kategori === 'bank_qris' || kategori === 'qris_cod' || kategori === 'e_wallet') {
             qrisFields.slideDown(300);
+            
+            // Update labels based on category in edit modal
+            if (kategori === 'e_wallet') {
+                // Untuk E-Wallet
+                $('#edit_account_name_label').text('Nama Pemilik Akun');
+                $('#edit_account_number_label').text('Nomor Telepon/ID E-Wallet');
+                $('#edit_provider_label').text('Nama E-Wallet');
+                $('#edit_qris_image_label').text('Logo/Screenshot E-Wallet Baru');
+                
+                // Update placeholders
+                $('#edit_account_name').attr('placeholder', 'Nama pemilik akun e-wallet');
+                $('#edit_account_number').attr('placeholder', 'Nomor HP/ID e-wallet');
+                $('#edit_provider').attr('placeholder', 'Contoh: OVO, Gopay, Dana');
+                $('#edit_qris_image').next('.custom-file-label').text('Pilih file logo/screenshot baru...');
+                
+                // Show E-Wallet hint
+                ewalletHint.show();
+            } else {
+                // Untuk Bank/QRIS & QRIS COD
+                $('#edit_account_name_label').text('Nama Pemilik Rekening');
+                $('#edit_account_number_label').text('Nomor Rekening/QRIS');
+                $('#edit_provider_label').text('Provider/Bank');
+                $('#edit_qris_image_label').text('Gambar QRIS Baru');
+                
+                // Update placeholders
+                $('#edit_account_name').attr('placeholder', 'Nama pemilik rekening');
+                $('#edit_account_number').attr('placeholder', 'Nomor rekening/QRIS');
+                $('#edit_provider').attr('placeholder', 'Contoh: BCA, BRI, Mandiri');
+                $('#edit_qris_image').next('.custom-file-label').text('Pilih file QRIS baru...');
+                
+                // Hide E-Wallet hint
+                ewalletHint.hide();
+            }
         } else {
             qrisFields.slideUp(300);
         }
+    }
+    
+    // Initialize based on old input
+    if ($('#kategori').val()) {
+        toggleQrisFields();
     }
 
     // Image preview function
@@ -985,13 +1092,14 @@ $(document).ready(function() {
     window.removeImage = function(previewId) {
         $('#' + previewId).attr('src', '');
         $('#' + previewId + 'Container').hide();
-        $('#' + previewId.replace('Preview', '')).val('');
-        $('#' + previewId.replace('Preview', '')).next('.custom-file-label').html('Pilih file...');
+        const inputId = previewId.replace('Preview', '');
+        $('#' + inputId).val('');
+        $('#' + inputId).next('.custom-file-label').html('Pilih file...');
     }
 
     // Remove current QRIS in edit modal
     window.removeCurrentQRIS = function() {
-        if (confirm('Apakah Anda yakin ingin menghapus QRIS ini?')) {
+        if (confirm('Apakah Anda yakin ingin menghapus gambar ini?')) {
             $('#currentQrisImage').attr('src', '');
             $('#currentQrisContainer').hide();
             $('#remove_qris').val('1');
@@ -1003,6 +1111,7 @@ $(document).ready(function() {
         $('#addPaymentForm')[0].reset();
         $('#qrisFields').hide();
         $('#qrisPreviewContainer').hide();
+        $('#ewallet_hint').hide();
         bsCustomFileInput.init();
     }
 
@@ -1025,7 +1134,7 @@ $(document).ready(function() {
         $('#edit_account_number').val(accountNumber);
         $('#edit_provider').val(provider);
         
-        // Set current QRIS image
+        // Set current QRIS/Logo image
         const currentQrisImage = $('#currentQrisImage');
         const currentQrisContainer = $('#currentQrisContainer');
         if (qrisImage) {
@@ -1038,6 +1147,10 @@ $(document).ready(function() {
         
         // Hide new QRIS preview
         $('#editQrisPreviewContainer').hide();
+        
+        // Reset file input
+        $('#edit_qris_image').val('');
+        $('#edit_qris_image').next('.custom-file-label').text('Pilih file baru...');
         
         // Toggle QRIS fields based on category
         toggleEditQrisFields();
@@ -1076,6 +1189,7 @@ $(document).ready(function() {
             });
         }
     });
+
     // Delete Payment Method
     $('.btn-delete').click(function() {
         const id = $(this).data('id');
@@ -1094,7 +1208,7 @@ $(document).ready(function() {
                     _token: '{{ csrf_token() }}',
                     _method: 'DELETE'
                 },
-                dataType: 'json', // Expect JSON response
+                dataType: 'json',
                 success: function(response) {
                     if (response.success) {
                         showToast('success', response.message || 'Metode pembayaran berhasil dihapus');
@@ -1140,22 +1254,51 @@ $(document).ready(function() {
         }
     });
 
-    // View QRIS in modal
-    window.viewQRIS = function(imageUrl, title) {
+    // View QRIS in modal with kategori support
+    window.viewQRIS = function(imageUrl, title, kategori) {
         $('#modalQrisImage').attr('src', imageUrl);
         $('#modalQrisTitle').text(title);
+        
+        // Set modal title based on kategori
+        let modalTitle = '';
+        if (kategori === 'e_wallet') {
+            modalTitle = 'Logo E-Wallet';
+        } else if (kategori === 'qris_cod') {
+            modalTitle = 'QRIS COD';
+        } else {
+            modalTitle = 'QRIS';
+        }
+        $('#modalTitlePrefix').text(modalTitle);
+        
         $('#qrisModal').modal('show');
         
         // Store for download
-        window.currentQRIS = { url: imageUrl, title: title };
+        window.currentQRIS = { 
+            url: imageUrl, 
+            title: title,
+            kategori: kategori 
+        };
     }
 
-    // Download QRIS
+    // Download QRIS/Logo
     window.downloadQRIS = function() {
         if (window.currentQRIS) {
             const link = document.createElement('a');
             link.href = window.currentQRIS.url;
-            link.download = window.currentQRIS.title.replace(/\s+/g, '_') + '_QRIS.png';
+            
+            let fileExtension = 'png';
+            if (window.currentQRIS.url.includes('.jpg') || window.currentQRIS.url.includes('.jpeg')) {
+                fileExtension = 'jpg';
+            }
+            
+            let prefix = '';
+            if (window.currentQRIS.kategori === 'e_wallet') {
+                prefix = 'Logo_';
+            } else {
+                prefix = 'QRIS_';
+            }
+            
+            link.download = prefix + window.currentQRIS.title.replace(/\s+/g, '_') + '.' + fileExtension;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1169,101 +1312,6 @@ $(document).ready(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
-
-    // Category Chart
-    const categoryChart = document.getElementById('categoryChart');
-    
-    if (categoryChart) {
-        // Data dari PHP
-        const bankQrisCount = "{{ $payments->where('kategori', 'bank_qris')->count() }}";
-        const qrisCodCount = "{{ $payments->where('kategori', 'qris_cod')->count() }}";
-        const eWalletCount = "{{ $payments->where('kategori', 'e_wallet')->count() }}";
-        const totalData = parseInt(bankQrisCount) + parseInt(qrisCodCount) + parseInt(eWalletCount);
-        
-        // Hanya tampilkan chart jika ada data
-        if (totalData > 0) {
-            try {
-                const ctx = categoryChart.getContext('2d');
-                
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Bank/QRIS', 'QRIS COD', 'E-Wallet'],
-                        datasets: [{
-                            data: [bankQrisCount, qrisCodCount, eWalletCount],
-                            backgroundColor: [
-                                'rgba(74, 144, 226, 0.8)',    // Bank/QRIS - biru
-                                'rgba(40, 167, 69, 0.8)',     // QRIS COD - hijau
-                                'rgba(255, 193, 7, 0.8)'      // E-Wallet - kuning
-                            ],
-                            borderColor: [
-                                'rgba(74, 144, 226, 1)',
-                                'rgba(40, 167, 69, 1)',
-                                'rgba(255, 193, 7, 1)'
-                            ],
-                            borderWidth: 2,
-                            hoverOffset: 15
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    padding: 20,
-                                    usePointStyle: true,
-                                    font: {
-                                        size: 12,
-                                        family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-                                    },
-                                    color: '#495057'
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.raw || 0;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = Math.round((value / total) * 100);
-                                        return `${label}: ${value} (${percentage}%)`;
-                                    }
-                                }
-                            }
-                        },
-                        cutout: '65%',
-                        animation: {
-                            animateScale: true,
-                            animateRotate: true
-                        }
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Chart error:', error);
-                // Fallback: Tampilkan pesan jika chart gagal
-                categoryChart.style.display = 'none';
-                $(categoryChart).parent().append(`
-                    <div class="text-center py-4">
-                        <i class="fas fa-chart-pie fa-2x text-muted mb-3"></i>
-                        <p class="text-muted mb-0">Tidak dapat menampilkan chart</p>
-                    </div>
-                `);
-            }
-        } else {
-            // Jika tidak ada data
-            categoryChart.style.display = 'none';
-            $(categoryChart).parent().append(`
-                <div class="text-center py-4">
-                    <i class="fas fa-chart-pie fa-2x text-muted mb-3"></i>
-                    <h5 class="text-muted">Belum ada data</h5>
-                    <p class="text-muted">Tambahkan metode pembayaran untuk melihat distribusi kategori</p>
-                </div>
-            `);
-        }
-    }
 
     // Form Validation
     $('#addPaymentForm, #editForm').on('submit', function(e) {
