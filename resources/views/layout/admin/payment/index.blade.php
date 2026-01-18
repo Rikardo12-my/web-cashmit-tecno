@@ -8,9 +8,9 @@
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">💳 Manajemen Pembayaran</h1>
-                </div>
+                <h1 class="m-0 text-dark">
+                        <i class="fas fa-money-bill-wave mr-2"></i> Management Pembayaran
+                </h1>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
@@ -44,58 +44,6 @@
                     </button>
                 </div>
             @endif
-
-            <!-- Stats Cards -->
-            <div class="row">
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-info">
-                        <div class="inner">
-                            <h3>{{ $payments->count() }}</h3>
-                            <p>Total Metode</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Lihat semua <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-success">
-                        <div class="inner">
-                            <h3>{{ $payments->where('is_active', true)->count() }}</h3>
-                            <p>Aktif</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-indigo">
-                        <div class="inner">
-                            <h3>{{ $payments->where('kategori', 'bank_qris')->count() }}</h3>
-                            <p>Bank/QRIS</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-university"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-warning">
-                        <div class="inner">
-                            <h3>{{ $payments->where('kategori', 'e_wallet')->count() }}</h3>
-                            <p>E-Wallet</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-            </div>
 
             <div class="row">
                 <!-- Left Column: Form & Table -->
@@ -138,7 +86,6 @@
                                                     id="kategori" name="kategori" required onchange="toggleQrisFields()">
                                                 <option value="">Pilih Kategori</option>
                                                 <option value="bank_qris" {{ old('kategori') == 'bank_qris' ? 'selected' : '' }}>Bank/QRIS</option>
-                                                <option value="qris_cod" {{ old('kategori') == 'qris_cod' ? 'selected' : '' }}>QRIS COD</option>
                                                 <option value="e_wallet" {{ old('kategori') == 'e_wallet' ? 'selected' : '' }}>E-Wallet</option>
                                             </select>
                                             @error('kategori')
@@ -566,24 +513,6 @@
                                     <span class="badge bg-info badge-pill">{{ $payments->whereNotNull('qris_image')->count() }}</span>
                                 </li>
                             </ul>
-                        </div>
-                    </div>
-
-                    <!-- QRIS Preview -->
-                    <div class="card card-warning card-outline">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-qrcode mr-2"></i>
-                                Preview QRIS/Logo
-                            </h3>
-                        </div>
-                        <div class="card-body text-center">
-                            <div id="qrisViewContainer">
-                                <p class="text-muted mb-0">
-                                    <i class="fas fa-info-circle mr-1"></i>
-                                    Klik "Lihat" pada tabel untuk melihat QRIS/Logo
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>

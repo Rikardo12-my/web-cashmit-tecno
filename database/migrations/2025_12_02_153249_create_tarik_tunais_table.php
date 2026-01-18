@@ -24,28 +24,45 @@ return new class extends Migration
             $table->unsignedBigInteger('payment_method_id')->nullable();
             $table->unsignedBigInteger('lokasi_cod_id')->nullable();
 
+            // ========== BUKTI CUSTOMER ==========
             $table->string('bukti_bayar_customer')->nullable();
+            $table->timestamp('waktu_upload_bukti_customer')->nullable();
+            
+            // ========== BUKTI PETUGAS ==========
             $table->string('bukti_serah_terima_petugas')->nullable();
+            $table->timestamp('waktu_upload_bukti_petugas')->nullable();
+            $table->text('catatan_serah_terima')->nullable();
 
+            // ========== TIMELINE ==========
             $table->timestamp('waktu_diproses')->nullable();
             $table->timestamp('waktu_dalam_perjalanan')->nullable();
             $table->timestamp('waktu_diserahkan')->nullable();
+            $table->timestamp('waktu_verifikasi_qris')->nullable(); // TAMBAHKAN INI UNTUK QRIS COD
             $table->timestamp('waktu_selesai')->nullable();
             $table->timestamp('waktu_dibatalkan')->nullable();
 
+            // ========== STATUS ==========
             $table->enum('status', [
                 'pending',              
                 'menunggu_admin',       
-                'diproses',             
+                'menunggu_pembayaran',  // Customer perlu bayar
+                'menunggu_verifikasi_admin', // Sudah upload bukti, tunggu verifikasi
+                'menunggu_verifikasi_qris', // STATUS BARU: Untuk QRIS COD
+                'diproses',             // Admin sudah verifikasi
                 'dalam_perjalanan',    
                 'menunggu_serah_terima',
                 'selesai',
-                'dibatalkan'
+                'dibatalkan_customer',
+                'dibatalkan_admin'
             ])->default('pending');
 
+            // ========== CATATAN ==========
             $table->text('catatan_admin')->nullable();
             $table->text('catatan_petugas')->nullable();
             $table->text('catatan_customer')->nullable();
+
+            // ========== FLAG UNTUK QRIS COD ==========
+            $table->boolean('is_qris_cod')->default(false); // TAMBAHKAN INI
 
             $table->timestamps();
 

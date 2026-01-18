@@ -10,7 +10,7 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0 text-dark">
-                        <i class="fas fa-map-marker-alt mr-2"></i>📍 Management Lokasi COD
+                        <i class="fas fa-map-marker-alt mr-2"></i> Management Lokasi COD
                     </h1>
                 </div>
                 <div class="col-sm-6">
@@ -26,57 +26,6 @@
     <!-- Main Content -->
     <div class="content">
         <div class="container-fluid">
-            <!-- Stats Cards -->
-            <div class="row">
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-cyan">
-                        <div class="inner">
-                            <h3>{{ $lokasi->count() }}</h3>
-                            <p>Total Lokasi</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-map-marked-alt"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Lihat semua <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-success">
-                        <div class="inner">
-                            <h3>{{ $lokasi->where('status', true)->count() }}</h3>
-                            <p>Lokasi Aktif</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-store"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-warning">
-                        <div class="inner">
-                            <h3>{{ $lokasi->where('status', false)->count() }}</h3>
-                            <p>Lokasi Nonaktif</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-store-slash"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-purple">
-                        <div class="inner">
-                            <h3>{{ $statistik->count() }}</h3>
-                            <p>Lokasi Populer</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-fire"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Analytics <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-            </div>
 
             <div class="row">
                 <!-- Left Column: Form & Table -->
@@ -534,40 +483,6 @@
                                         <div class="stat-number text-info">{{ $lokasi->whereNotNull('latitude')->count() }}</div>
                                         <div class="stat-label">Berkoordinat</div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="card card-outline card-warning">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-bolt mr-2"></i>
-                                Aksi Cepat
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <button class="btn btn-outline-primary btn-block btn-action" id="exportBtn">
-                                        <i class="fas fa-file-export mr-2"></i> Export
-                                    </button>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <button class="btn btn-outline-success btn-block btn-action" id="printBtn">
-                                        <i class="fas fa-print mr-2"></i> Print
-                                    </button>
-                                </div>
-                                <div class="col-6">
-                                    <a href="{{ route('admin.lokasi.statistik') }}" class="btn btn-outline-info btn-block btn-action">
-                                        <i class="fas fa-chart-bar mr-2"></i> Analytics
-                                    </a>
-                                </div>
-                                <div class="col-6">
-                                    <button class="btn btn-outline-secondary btn-block btn-action" id="refreshBtn">
-                                        <i class="fas fa-sync-alt mr-2"></i> Refresh
-                                    </button>
                                 </div>
                             </div>
                         </div>

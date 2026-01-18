@@ -35,10 +35,8 @@
   </div>
 
   <!-- Navbar -->
+ @include('layout.partials.navbar_petugas')
   <!-- /.navbar -->
-
-  <!-- Main Sidebar Container -->
- @include('layout.partials.sidebar')
 
   <!-- Content Wrapper. Contains page content -->
 @yield('content')

@@ -10,7 +10,7 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0 text-dark">
-                        <i class="fas fa-user-tie mr-2"></i>👨‍💼 Manajemen Petugas
+                        <i class="fas fa-user-tie mr-2"></i>Manajemen Petugas
                     </h1>
                 </div>
                 <div class="col-sm-6">
@@ -27,85 +27,46 @@
     <div class="content">
         <div class="container-fluid">
             <!-- Stats Cards -->
-            <div class="row">
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-cyan">
-                        <div class="inner">
-                            <h3>{{ $totalPetugas }}</h3>
-                            <p>Total Petugas</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-users-cog"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Lihat semua <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-success">
-                        <div class="inner">
-                            <h3>{{ $activePetugas }}</h3>
-                            <p>Petugas Aktif</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-danger">
-                        <div class="inner">
-                            <h3>{{ $bannedPetugas }}</h3>
-                            <p>Petugas Diblokir</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-user-slash"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-warning">
-                        <div class="inner">
-                            <h3>{{ $petugas->where('status', 'verify')->count() }}</h3>
-                            <p>Menunggu Verifikasi</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-user-clock"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Verifikasi <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-            </div>
+            
 
-            <!-- Action Buttons -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card card-outline card-primary">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="mb-0">
-                                        <i class="fas fa-cogs mr-2"></i>Kelola Petugas
-                                    </h5>
-                                    <p class="text-muted mb-0">Tambahkan atau kelola data petugas</p>
-                                </div>
-                                <div class="btn-group">
-                                    <a href="{{ route('admin.petugas.create') }}" class="btn btn-primary">
-                                        <i class="fas fa-plus-circle mr-2"></i>Tambah Petugas Baru
-                                    </a>
-                                    <a href="{{ route('admin.petugas.deleted') }}" class="btn btn-warning">
-                                        <i class="fas fa-trash-restore mr-2"></i>Petugas Terhapus
-                                    </a>
-                                    <button class="btn btn-info" id="exportPetugasBtn">
-                                        <i class="fas fa-file-export mr-2"></i>Export Data
-                                    </button>
-                                </div>
+            <!-- Action Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-md-flex align-items-center justify-content-between">
+                    <!-- Title Section -->
+                    <div class="mb-3 mb-md-0">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="bg-gradient-primary rounded-circle p-2 mr-3">
+                                <i class="fas fa-users-cog text-white fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 font-weight-semibold">Kelola Petugas</h5>
+                                <p class="text-muted mb-0 small">Kelola data petugas dan tugas-tugas terkait</p>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ route('admin.petugas.create') }}" 
+                           class="btn btn-primary btn-icon">
+                            <i class="fas fa-plus-circle mr-2"></i>
+                            Tambah Baru
+                        </a>
+                        
+                        <a href="{{ route('admin.petugas.deleted') }}" 
+                           class="btn btn-outline-warning btn-icon">
+                            <i class="fas fa-trash-restore mr-2"></i>
+                            Arsip
+                        </a>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
             <!-- Petugas Table -->
             <div class="row">
@@ -208,9 +169,6 @@
                                                         <i class="fas fa-check-circle mr-1"></i>Terverifikasi
                                                     </small>
                                                     @else
-                                                    <small class="text-warning">
-                                                        <i class="fas fa-clock mr-1"></i>Belum verifikasi
-                                                    </small>
                                                     @endif
                                                 </div>
                                             </td>

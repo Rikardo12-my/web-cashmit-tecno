@@ -7,7 +7,11 @@ use App\Http\Controllers\LokasiCodController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\TarikTunaiController;
+use App\Http\Controllers\CustomerTarikTunaiController;
 use App\Http\Controllers\PetugasController;
+use App\Http\Controllers\PetugasTarikTunaiController;
+use App\Http\Controllers\CustomerProfileController;
+use App\Http\Controllers\AdminTarikTunaiController;
 use App\Http\Controllers\VerificationController;
 
 Route::get('/', function () {
@@ -97,40 +101,79 @@ Route::group(['middleware' => ['auth', 'check_role:admin']], function () {
             Route::put('/toggle-status/{id}', [PaymentMethodController::class, 'toggleStatus'])->name('toggle-status');
             Route::delete('/{id}', [PaymentMethodController::class, 'destroy'])->name('destroy');
         });
-
-        // Tarik Tunai Routes
         Route::prefix('tarik-tunai')->name('tariktunai.')->group(function () {
-            // Main Routes
-            Route::get('/', [TarikTunaiController::class, 'index'])->name('index');
-            Route::get('/create', [TarikTunaiController::class, 'create'])->name('create');
-            Route::post('/', [TarikTunaiController::class, 'store'])->name('store');
-            Route::get('/{id}', [TarikTunaiController::class, 'show'])->name('show');
-            Route::get('/{id}/edit', [TarikTunaiController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [TarikTunaiController::class, 'update'])->name('update');
-            Route::delete('/{id}', [TarikTunaiController::class, 'destroy'])->name('destroy');
-
-            // Export Routes
-            Route::get('/export/pdf', [TarikTunaiController::class, 'exportPDF'])->name('export.pdf');
-            Route::get('/export/excel', [TarikTunaiController::class, 'exportExcel'])->name('export.excel');
-
-            // Action Routes
-            Route::post('/{id}/assign-petugas', [TarikTunaiController::class, 'assignPetugas'])->name('assign-petugas');
-            Route::put('/{id}/update-status', [TarikTunaiController::class, 'updateStatus'])->name('update-status');
-            Route::post('/{id}/upload-bukti', [TarikTunaiController::class, 'uploadBuktiSerahTerima'])->name('upload-bukti');
-            Route::post('/batch-status', [TarikTunaiController::class, 'batchStatusUpdate'])->name('batch-status');
-
-            // API Routes for AJAX
-            Route::get('/api/payment-methods', [TarikTunaiController::class, 'getPaymentMethodsByCategory'])->name('api.payment-methods');
-            Route::get('/api/cod-locations/{paymentMethodId}', [TarikTunaiController::class, 'getCodLocations'])->name('api.cod-locations');
-        });
+    Route::get('/', [AdminTarikTunaiController::class, 'index'])->name('index');
+    Route::get('/{tarikTunai}', [AdminTarikTunaiController::class, 'show'])->name('show');
+    
+    // Assign Petugas
+    Route::post('/{tarikTunai}/assign', [AdminTarikTunaiController::class, 'assignPetugas'])->name('assign');
+    Route::post('/bulk-assign', [AdminTarikTunaiController::class, 'bulkAssign'])->name('bulk-assign');
+    
+    // Status Management
+    Route::post('/{tarikTunai}/status', [AdminTarikTunaiController::class, 'updateStatus'])->name('update-status');
+    
+    // Verifikasi Bukti Bayar
+    Route::post('/{tarikTunai}/verifikasi-bukti', [AdminTarikTunaiController::class, 'verifikasiBuktiBayar'])
+        ->name('verifikasi-bukti');
+    
+    // Biaya Admin
+    Route::get('/{tarikTunai}/set-biaya', [AdminTarikTunaiController::class, 'setBiayaForm'])
+        ->name('set-biaya-form');
+    Route::post('/{tarikTunai}/set-biaya', [AdminTarikTunaiController::class, 'setBiayaAdmin'])
+        ->name('set-biaya');
+    
+    // Export
+    Route::get('/export/csv', [AdminTarikTunaiController::class, 'exportCsv'])->name('export');
+    
+    // View Bukti Bayar
+    Route::get('/{tarikTunai}/view-bukti', [AdminTarikTunaiController::class, 'viewBukti'])
+        ->name('view-bukti');
+    
+    // Delete
+    Route::delete('/{tarikTunai}', [AdminTarikTunaiController::class, 'destroy'])->name('destroy');
+});
     });
 });
 
-//route yang hanya bisa diakses oleh petugas
-Route::group(['middleware' => ['auth', 'check_role:petugas']], function () {});
+Route::group(['middleware' => ['auth', 'check_role:petugas']], function () {
+    Route::get('/petugas/dashboard', [DashboardController::class, 'petugasDashboard'])->name('petugas/dashboard');
+
+    Route::prefix('petugas/tariktunai')->name('petugas.tariktunai.')->group(function () {
+    Route::get('/', [PetugasTarikTunaiController::class, 'index'])->name('index');
+    Route::get('/{tarikTunai}', [PetugasTarikTunaiController::class, 'show'])->name('show');
+    Route::put('/{tarikTunai}/status', [PetugasTarikTunaiController::class, 'updateStatus'])->name('update-status');
+    Route::post('/{tarikTunai}/upload-bukti', [PetugasTarikTunaiController::class, 'uploadBukti'])->name('upload-bukti');
+    Route::post('/{tarikTunai}/catatan', [PetugasTarikTunaiController::class, 'updateCatatan'])->name('update-catatan');
+    Route::post('/{tarikTunai}/selesai', [PetugasTarikTunaiController::class, 'markAsSelesai'])->name('mark-selesai');
+    Route::get('/{tarikTunai}/location-detail', [PetugasTarikTunaiController::class, 'getLocationDetail'])->name('location-detail');
+    Route::get('/{tarikTunai}/download-qris', [PetugasTarikTunaiController::class, 'downloadQris'])->name('download-qris');
+});
+});
 
 //route yang hanya bisa diakses oleh customer
-Route::group(['middleware' => ['auth', 'check_role:customer', 'check_status']], function () {});
+Route::group(['middleware' => ['auth', 'check_role:customer', 'check_status']], function () {
+    Route::get('/customer/dashboard', [DashboardController::class, 'customerDashboard'])->name('customer/dashboard');
+    Route::prefix('customer/tariktunai')->name('customer.tariktunai.')->group(function () {
+        Route::get('/', [CustomerTarikTunaiController::class, 'index'])->name('index');
+        Route::get('/create', [CustomerTarikTunaiController::class, 'create'])->name('create');
+        Route::post('/', [CustomerTarikTunaiController::class, 'store'])->name('store');
+        Route::get('/{tarikTunai}', [CustomerTarikTunaiController::class, 'show'])->name('show');
+        Route::put('/{tarikTunai}/upload-bukti', [CustomerTarikTunaiController::class, 'uploadBukti'])->name('upload-bukti');
+        Route::delete('/{tarikTunai}/cancel', [CustomerTarikTunaiController::class, 'cancel'])->name('cancel');
+        Route::get('/qris/{id}', [CustomerTarikTunaiController::class, 'getQrisImage'])->name('get-qris');
+        Route::get('/location/{id}', [CustomerTarikTunaiController::class, 'getLocationImage'])->name('get-location');
+        Route::get('/{tarikTunai}/detail', [CustomerTarikTunaiController::class, 'getDetail'])->name('detail');
+        Route::get('/api/qris/all', [CustomerTarikTunaiController::class, 'getAllQrisImages'])->name('api.qris.all');
+    });
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [CustomerProfileController::class, 'index'])->name('index');
+        Route::get('/edit', [CustomerProfileController::class, 'edit'])->name('edit');
+        Route::post('/update-nama', [CustomerProfileController::class, 'updateNama'])->name('update-nama');
+        Route::post('/upload-foto', [CustomerProfileController::class, 'uploadFoto'])->name('upload-foto');
+        Route::post('/hapus-foto', [CustomerProfileController::class, 'hapusFoto'])->name('hapus-foto');
+        Route::post('/update-password', [CustomerProfileController::class, 'updatePassword'])->name('update-password');
+    });
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');

@@ -1,97 +1,6 @@
 @extends('layout.admin.master')
 
-@section('title', 'Detail Transaksi Tarik Tunai')
-
-@section('css')
-<style>
-    .transaction-header {
-        background: linear-gradient(135deg, #4a90e2 0%, #2c6bb3 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-    
-    .info-card {
-        border: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    
-    .info-card .card-header {
-        background-color: #f8fbff;
-        border-bottom: 2px solid #e8f4ff;
-    }
-    
-    .user-avatar-lg {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-    
-    .action-timeline {
-        position: relative;
-        padding-left: 30px;
-    }
-    
-    .action-timeline::before {
-        content: '';
-        position: absolute;
-        left: 10px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: #e9ecef;
-    }
-    
-    .timeline-item {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    
-    .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: -25px;
-        top: 5px;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: #4a90e2;
-        border: 2px solid white;
-        box-shadow: 0 0 0 3px #e8f4ff;
-    }
-    
-    .evidence-image {
-        max-width: 300px;
-        border-radius: 8px;
-        border: 1px solid #dee2e6;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-    
-    .evidence-image:hover {
-        transform: scale(1.05);
-    }
-    
-    .status-badge-lg {
-        padding: 8px 20px;
-        border-radius: 25px;
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-    
-    .badge-pending { background: #fff3cd; color: #856404; }
-    .badge-diproses { background: #cce5ff; color: #004085; }
-    .badge-menunggu_petugas { background: #d4edda; color: #155724; }
-    .badge-dalam_perjalanan { background: #fff3cd; color: #856404; }
-    .badge-selesai { background: #d1ecf1; color: #0c5460; }
-    .badge-dibatalkan { background: #f8d7da; color: #721c24; }
-</style>
-@endsection
+@section('title', 'Detail Tarik Tunai')
 
 @section('content')
 <div class="content-wrapper">
@@ -101,14 +10,19 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0 text-dark">
-                        <i class="fas fa-file-invoice-dollar mr-2 text-primary"></i>
-                        Detail Transaksi
+                        <i class="fas fa-receipt mr-2"></i>📄 Detail Tarik Tunai
                     </h1>
+                    @if($tarikTunai->isQRISCOD())
+                        <span class="badge badge-orange mt-2">
+                            <i class="fas fa-qrcode mr-1"></i> QRIS COD
+                        </span>
+                    @endif
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.tariktunai.index') }}">Tarik Tunai</a></li>
-                        <li class="breadcrumb-item active">Detail #{{ $transaction->id }}</li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.tariktunai.index') }}"><i class="fas fa-money-bill-wave"></i> Tarik Tunai</a></li>
+                        <li class="breadcrumb-item active"><i class="fas fa-eye"></i> Detail</li>
                     </ol>
                 </div>
             </div>
@@ -116,560 +30,666 @@
     </div>
 
     <!-- Main Content -->
-    <section class="content">
+    <div class="content">
         <div class="container-fluid">
-            <!-- Transaction Header -->
-            <div class="transaction-header">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <div class="d-flex align-items-center">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($transaction->user->name) }}&background=fff&color=4a90e2&size=80" 
-                                 class="user-avatar-lg mr-4">
-                            <div>
-                                <h2 class="mb-1">{{ $transaction->user->name }}</h2>
-                                <p class="mb-1">
-                                    <i class="fas fa-envelope mr-2"></i>{{ $transaction->user->email }}
-                                </p>
-                                <p class="mb-0">
-                                    <i class="fas fa-calendar mr-2"></i>
-                                    Dibuat: {{ $transaction->created_at->format('d F Y H:i') }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 text-right">
-                        <div class="display-4 font-weight-bold">
-                            Rp {{ number_format($transaction->jumlah, 0, ',', '.') }}
-                        </div>
-                        <span class="status-badge-lg badge-{{ $transaction->status }}">
-                            {{ $transaction->getStatusLabelAttribute()['label'] }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="btn-group" role="group">
-                        <a href="{{ route('admin.tariktunai.edit', $transaction->id) }}" class="btn btn-warning">
-                            <i class="fas fa-edit mr-2"></i> Edit
-                        </a>
-                        
-                        @if(in_array($transaction->status, ['pending', 'menunggu_petugas']))
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#assignModal">
-                            <i class="fas fa-user-tag mr-2"></i> Assign Petugas
-                        </button>
-                        @endif
-                        
-                        @if($transaction->status == 'dalam_perjalanan')
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#completeModal">
-                            <i class="fas fa-check-circle mr-2"></i> Tandai Selesai
-                        </button>
-                        @endif
-                        
-                        @if(!in_array($transaction->status, ['selesai', 'dibatalkan']))
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelModal">
-                            <i class="fas fa-times-circle mr-2"></i> Batalkan
-                        </button>
-                        @endif
-                        
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                <i class="fas fa-cog mr-2"></i> Lainnya
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#" onclick="window.print()">
-                                    <i class="fas fa-print mr-2"></i> Cetak
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-share-alt mr-2"></i> Bagikan
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="#" data-toggle="modal" data-target="#deleteModal">
-                                    <i class="fas fa-trash mr-2"></i> Hapus
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="row">
-                <!-- Left Column: Transaction Details -->
                 <div class="col-md-8">
-                    <!-- Basic Information Card -->
-                    <div class="card info-card">
+                    <!-- Transaction Info Card -->
+                    <div class="card card-outline card-primary">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-info-circle mr-2 text-primary"></i>
+                                <i class="fas fa-info-circle mr-2"></i>
                                 Informasi Transaksi
                             </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <table class="table table-borderless">
-                                        <tr>
-                                            <th width="40%">ID Transaksi</th>
-                                            <td>#{{ $transaction->id }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Customer</th>
-                                            <td>{{ $transaction->user->name }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Email</th>
-                                            <td>{{ $transaction->user->email }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Telepon</th>
-                                            <td>{{ $transaction->user->phone ?? '-' }}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="col-md-6">
-                                    <table class="table table-borderless">
-                                        <tr>
-                                            <th width="40%">Metode Pembayaran</th>
-                                            <td>
-                                                <span class="badge badge-info">
-                                                    {{ $transaction->paymentMethod->nama ?? 'N/A' }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        @if($transaction->lokasiCod)
-                                        <tr>
-                                            <th>Lokasi COD</th>
-                                            <td>
-                                                {{ $transaction->lokasiCod->nama }}<br>
-                                                <small class="text-muted">{{ $transaction->lokasiCod->alamat }}</small>
-                                            </td>
-                                        </tr>
-                                        @endif
-                                        <tr>
-                                            <th>Petugas</th>
-                                            <td>
-                                                @if($transaction->petugas)
-                                                <span class="badge badge-success">
-                                                    {{ $transaction->petugas->name }}
-                                                </span>
-                                                @else
-                                                <span class="badge badge-secondary">
-                                                    Belum ditugaskan
-                                                </span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
+                            <div class="card-tools">
+                                <span class="badge badge-primary">
+                                    {{ $tarikTunai->kode_transaksi }}
+                                </span>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Payment Evidence Card -->
-                    <div class="card info-card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-file-image mr-2 text-primary"></i>
-                                Bukti Pembayaran
-                            </h3>
-                        </div>
                         <div class="card-body">
-                            @if($transaction->bukti_bayar_customer)
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h6>Bukti Bayar Customer</h6>
-                                    <img src="{{ $transaction->getBuktiBayarUrlAttribute() }}" 
-                                         class="evidence-image" 
-                                         data-toggle="modal" 
-                                         data-target="#imageModal"
-                                         data-image="{{ $transaction->getBuktiBayarUrlAttribute() }}"
-                                         data-title="Bukti Bayar Customer">
-                                    <p class="mt-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            Diupload saat pembuatan transaksi
-                                        </small>
-                                    </p>
+                                    <div class="info-item mb-4">
+                                        <label class="text-muted d-block">
+                                            <i class="fas fa-user mr-2"></i>Customer
+                                        </label>
+                                        <div class="d-flex align-items-center mt-2">
+                                            <div class="avatar-placeholder rounded-circle mr-3 d-flex align-items-center justify-content-center"
+                                                 style="width: 50px; height: 50px; background: linear-gradient(45deg, #667eea, #764ba2);">
+                                                <i class="fas fa-user text-white fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">{{ $tarikTunai->user->nama ?? 'N/A' }}</h5>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-envelope mr-1"></i>{{ $tarikTunai->user->email ?? '-' }}
+                                                </small>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone mr-1"></i>{{ $tarikTunai->user->telepon ?? '-' }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                @if($transaction->bukti_serah_terima_petugas)
                                 <div class="col-md-6">
-                                    <h6>Bukti Serah Terima</h6>
-                                    <img src="{{ $transaction->getBuktiSerahTerimaUrlAttribute() }}" 
-                                         class="evidence-image" 
-                                         data-toggle="modal" 
-                                         data-target="#imageModal"
-                                         data-image="{{ $transaction->getBuktiSerahTerimaUrlAttribute() }}"
-                                         data-title="Bukti Serah Terima">
-                                    <p class="mt-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            Diupload: {{ $transaction->waktu_diserahkan ? $transaction->waktu_diserahkan->format('d F Y H:i') : '-' }}
-                                        </small>
-                                    </p>
+                                    <div class="info-item mb-4">
+                                        <label class="text-muted d-block">
+                                            <i class="fas fa-user-tie mr-2"></i>Petugas
+                                        </label>
+                                        @if($tarikTunai->petugas)
+                                        <div class="d-flex align-items-center mt-2">
+                                            <div class="avatar-placeholder rounded-circle mr-3 d-flex align-items-center justify-content-center"
+                                                 style="width: 50px; height: 50px; background: linear-gradient(45deg, #43e97b, #38f9d7);">
+                                                <i class="fas fa-user-tie text-white fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0">{{ $tarikTunai->petugas->nama }}</h5>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-check-circle mr-1 text-success"></i>Ditugaskan
+                                                </small>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                                    {{ $tarikTunai->waktu_diproses->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        @else
+                                        <div class="alert alert-warning mt-2">
+                                            <i class="fas fa-user-clock mr-2"></i>Belum ada petugas yang ditugaskan
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item mb-4">
+                                        <label class="text-muted d-block">
+                                            <i class="fas fa-money-bill-wave mr-2"></i>Detail Pembayaran
+                                        </label>
+                                        <div class="mt-2">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Jumlah Tarik Tunai:</span>
+                                                <strong class="text-primary">Rp {{ number_format($tarikTunai->jumlah, 0, ',', '.') }}</strong>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Biaya Admin:</span>
+                                                <strong class="text-warning">Rp {{ number_format($tarikTunai->biaya_admin, 0, ',', '.') }}</strong>
+                                            </div>
+                                            <hr>
+                                            <div class="d-flex justify-content-between">
+                                                <span><strong>Total Dibayar:</strong></span>
+                                                <strong class="text-success" style="font-size: 1.2rem;">
+                                                    Rp {{ number_format($tarikTunai->total_dibayar, 0, ',', '.') }}
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item mb-4">
+                                        <label class="text-muted d-block">
+                                            <i class="fas fa-map-marker-alt mr-2"></i>Lokasi & Metode
+                                        </label>
+                                        <div class="mt-2">
+                                            @if($tarikTunai->lokasiCod)
+                                            <div class="mb-2">
+                                                <small class="text-muted d-block">Lokasi COD:</small>
+                                                <strong>{{ $tarikTunai->lokasiCod->nama_lokasi }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ $tarikTunai->lokasiCod->alamat }}</small>
+                                            </div>
+                                            @endif
+                                            @if($tarikTunai->paymentMethod)
+                                            <div>
+                                                <small class="text-muted d-block">Metode Pembayaran:</small>
+                                                <strong>
+                                                    {{ $tarikTunai->paymentMethod->nama }}
+                                                    @if($tarikTunai->isQRISCOD())
+                                                        <span class="badge badge-orange ml-2">QRIS COD</span>
+                                                    @endif
+                                                </strong>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Timeline -->
+                            <div class="info-item mb-4">
+                                <label class="text-muted d-block mb-3">
+                                    <i class="fas fa-history mr-2"></i>Timeline Status
+                                </label>
+                                <div class="timeline">
+                                    @php
+                                        // Gunakan custom attributes dari model
+                                        $timelineSteps = $tarikTunai->timelineSteps;
+                                        $currentStep = $tarikTunai->currentStep;
+                                    @endphp
+                                    
+                                    <div class="d-flex justify-content-between position-relative">
+                                        @foreach($timelineSteps as $label => $time)
+                                            @if($time || $loop->first || $loop->last || $loop->index < $currentStep)
+                                            <div class="text-center" style="flex: 1;">
+                                                <div class="timeline-step mb-2">
+                                                    <div class="step-circle {{ $loop->index < $currentStep ? 'completed' : ($loop->index == $currentStep ? 'active' : 'pending') }}">
+                                                        {{ $loop->iteration }}
+                                                    </div>
+                                                    <div class="step-label mt-2">
+                                                        <small class="d-block text-muted">{{ $label }}</small>
+                                                        @if($time)
+                                                        <small class="text-success">{{ $time->timezone('Asia/Jakarta')->format('d/m/ H:i') }}</small>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Catatan -->
+                            <div class="row">
+                                @if($tarikTunai->catatan_admin)
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <label class="text-muted d-block">
+                                            <i class="fas fa-user-shield mr-2"></i>Catatan Admin
+                                        </label>
+                                        <div class="alert alert-info mt-2">
+                                            {{ $tarikTunai->catatan_admin }}
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+                                @if($tarikTunai->catatan_petugas)
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <label class="text-muted d-block">
+                                            <i class="fas fa-user-tie mr-2"></i>Catatan Petugas
+                                        </label>
+                                        <div class="alert alert-warning mt-2">
+                                            {{ $tarikTunai->catatan_petugas }}
+                                        </div>
+                                    </div>
                                 </div>
                                 @endif
                             </div>
-                            @else
-                            <div class="text-center py-4">
-                                <i class="fas fa-image fa-3x text-muted mb-3"></i>
-                                <h5>Tidak ada bukti pembayaran</h5>
-                                <p class="text-muted">Customer belum mengupload bukti pembayaran</p>
+                            
+                            <!-- Bukti Serah Terima Petugas -->
+                            @if($tarikTunai->bukti_serah_terima_petugas)
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="info-item">
+                                        <label class="text-muted d-block">
+                                            <i class="fas fa-file-contract mr-2"></i>Bukti Serah Terima Petugas
+                                        </label>
+                                        <div class="text-center mt-2">
+                                            <img src="{{ Storage::url($tarikTunai->bukti_serah_terima_petugas) }}" 
+                                                 alt="Bukti Serah Terima" 
+                                                 class="img-fluid rounded shadow-sm mb-2"
+                                                 style="max-height: 200px;">
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-alt mr-1"></i>
+                                                {{ $tarikTunai->waktu_upload_bukti_petugas->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}
+                                            </small>
+                                            <br>
+                                            <a href="{{ Storage::url($tarikTunai->bukti_serah_terima_petugas) }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-outline-primary mt-2">
+                                                <i class="fas fa-expand mr-1"></i> Lihat Full Size
+                                            </a>
+                                        </div>
+                                        @if($tarikTunai->catatan_serah_terima)
+                                        <div class="alert alert-light mt-2">
+                                            <i class="fas fa-sticky-note mr-2"></i>
+                                            {{ $tarikTunai->catatan_serah_terima }}
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                             @endif
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Actions & History -->
                 <div class="col-md-4">
-                    <!-- Status Actions Card -->
-                    <div class="card info-card">
+                    <!-- Status & Actions Card -->
+                    <div class="card card-outline card-info mb-4">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-sync-alt mr-2 text-primary"></i>
-                                Ubah Status
+                                <i class="fas fa-tasks mr-2"></i>
+                                Status & Aksi
                             </h3>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('admin.tariktunai.update-status', $transaction->id) }}" method="POST">
+                            <div class="text-center mb-4">
+                                <span class="badge badge-{{ $tarikTunai->statusColor }} badge-pill px-4 py-3" 
+                                      style="font-size: 1.1rem;">
+                                    <i class="fas fa-circle mr-2"></i>
+                                    {{ $tarikTunai->statusLabel }}
+                                </span>
+                            </div>
+
+                            @if($tarikTunai->status == 'menunggu_admin')
+                            <form action="{{ route('admin.tariktunai.assign', $tarikTunai->id) }}" method="POST" class="mb-3">
                                 @csrf
-                                @method('PUT')
-                                
                                 <div class="form-group">
-                                    <label for="status">Status Saat Ini</label>
-                                    <select name="status" id="status" class="form-control">
-                                        <option value="pending" {{ $transaction->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="diproses" {{ $transaction->status == 'diproses' ? 'selected' : '' }}>Diproses</option>
-                                        <option value="menunggu_petugas" {{ $transaction->status == 'menunggu_petugas' ? 'selected' : '' }}>Menunggu Petugas</option>
-                                        <option value="dalam_perjalanan" {{ $transaction->status == 'dalam_perjalanan' ? 'selected' : '' }}>Dalam Perjalanan</option>
-                                        <option value="selesai" {{ $transaction->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                        <option value="dibatalkan" {{ $transaction->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+                                    <label>Assign Petugas:</label>
+                                    <select name="petugas_id" class="form-control" required>
+                                        <option value="">-- Pilih Petugas --</option>
+                                        @foreach($petugasList as $petugas)
+                                        <option value="{{ $petugas->id }}">{{ $petugas->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-user-tie mr-1"></i> Assign Petugas
+                                </button>
+                            </form>
+                            @endif
+
+                            <hr>
+
+                            <!-- Form Update Status -->
+                            <form action="{{ route('admin.tariktunai.update-status', $tarikTunai->id) }}" method="POST" class="mb-3">
+                                @csrf
+                                <div class="form-group">
+                                    <label>Update Status:</label>
+                                    <select name="status" class="form-control">
+                                        <option value="">-- Pilih Status --</option>
+                                        
+                                        @if($tarikTunai->isQRISCOD())
+                                            <!-- Opsi khusus untuk QRIS COD -->
+                                            <option value="pending" {{ $tarikTunai->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="menunggu_admin" {{ $tarikTunai->status == 'menunggu_admin' ? 'selected' : '' }}>Menunggu Admin</option>
+                                            <option value="diproses" {{ $tarikTunai->status == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                                            <option value="dalam_perjalanan" {{ $tarikTunai->status == 'dalam_perjalanan' ? 'selected' : '' }}>Dalam Perjalanan</option>
+                                            <option value="menunggu_serah_terima" {{ $tarikTunai->status == 'menunggu_serah_terima' ? 'selected' : '' }}>Menunggu Serah Terima</option>
+                                            <option value="menunggu_verifikasi_qris" {{ $tarikTunai->status == 'menunggu_verifikasi_qris' ? 'selected' : '' }}>Menunggu Verifikasi QRIS</option>
+                                            <option value="selesai" {{ $tarikTunai->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                        @else
+                                            <!-- Opsi untuk metode pembayaran lain -->
+                                            <option value="pending" {{ $tarikTunai->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="menunggu_admin" {{ $tarikTunai->status == 'menunggu_admin' ? 'selected' : '' }}>Menunggu Admin</option>
+                                            <option value="menunggu_pembayaran" {{ $tarikTunai->status == 'menunggu_pembayaran' ? 'selected' : '' }}>Menunggu Pembayaran</option>
+                                            <option value="menunggu_verifikasi_admin" {{ $tarikTunai->status == 'menunggu_verifikasi_admin' ? 'selected' : '' }}>Menunggu Verifikasi Admin</option>
+                                            <option value="diproses" {{ $tarikTunai->status == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                                            <option value="dalam_perjalanan" {{ $tarikTunai->status == 'dalam_perjalanan' ? 'selected' : '' }}>Dalam Perjalanan</option>
+                                            <option value="menunggu_serah_terima" {{ $tarikTunai->status == 'menunggu_serah_terima' ? 'selected' : '' }}>Menunggu Serah Terima</option>
+                                            <option value="selesai" {{ $tarikTunai->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                        @endif
+                                        
+                                        <option value="dibatalkan_customer" {{ $tarikTunai->status == 'dibatalkan_customer' ? 'selected' : '' }}>Dibatalkan Customer</option>
+                                        <option value="dibatalkan_admin" {{ $tarikTunai->status == 'dibatalkan_admin' ? 'selected' : '' }}>Dibatalkan Admin</option>
                                     </select>
                                 </div>
                                 
+                                <!-- Field khusus untuk QRIS -->
+                                @if($tarikTunai->isQRISCOD() && $tarikTunai->status == 'menunggu_verifikasi_qris')
                                 <div class="form-group">
-                                    <label for="catatan_admin">Catatan</label>
-                                    <textarea name="catatan_admin" 
-                                              id="catatan_admin" 
-                                              class="form-control" 
-                                              rows="3"
-                                              placeholder="Tambahkan catatan perubahan status...">{{ old('catatan_admin', $transaction->catatan_admin) }}</textarea>
+                                    <label>Bukti Pembayaran QRIS:</label>
+                                    <input type="file" name="bukti_qris" class="form-control-file">
+                                    <small class="text-muted">Upload bukti pembayaran QRIS dari customer</small>
+                                </div>
+                                @endif
+                                
+                                <div class="form-group">
+                                    <label>Catatan Admin:</label>
+                                    <textarea name="catatan_admin" class="form-control" rows="2" 
+                                              placeholder="Tambahkan catatan...">{{ $tarikTunai->catatan_admin }}</textarea>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-primary btn-block">
-                                    <i class="fas fa-save mr-2"></i> Simpan Perubahan
+                                <!-- Tombol khusus untuk verifikasi QRIS -->
+                                @if($tarikTunai->isQRISCOD() && $tarikTunai->status == 'menunggu_verifikasi_qris')
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button type="submit" name="action" value="verifikasi_qris" class="btn btn-success btn-block">
+                                            <i class="fas fa-check-circle mr-1"></i> Verifikasi QRIS
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="submit" name="action" value="tolak_qris" class="btn btn-danger btn-block">
+                                            <i class="fas fa-times-circle mr-1"></i> Tolak QRIS
+                                        </button>
+                                    </div>
+                                </div>
+                                @else
+                                <button type="submit" class="btn btn-info btn-block">
+                                    <i class="fas fa-sync-alt mr-1"></i> Update Status
+                                </button>
+                                @endif
+                            </form>
+
+                            <!-- Form untuk set biaya admin -->
+                            @if(in_array($tarikTunai->status, ['pending', 'menunggu_admin']))
+                            <form action="{{ route('admin.tariktunai.set-biaya', $tarikTunai->id) }}" method="POST" class="mb-3">
+                                @csrf
+                                <div class="form-group">
+                                    <label>Set Biaya Admin:</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Rp</span>
+                                        </div>
+                                        <input type="number" name="biaya_admin" class="form-control" 
+                                               value="{{ $tarikTunai->biaya_admin }}" 
+                                               min="0" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Catatan:</label>
+                                    <textarea name="catatan_admin" class="form-control" rows="2" 
+                                              placeholder="Catatan untuk customer...">{{ $tarikTunai->catatan_admin }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-warning btn-block">
+                                    <i class="fas fa-money-bill-wave mr-1"></i> Set Biaya Admin
                                 </button>
                             </form>
-                        </div>
-                    </div>
+                            @endif
 
-                    <!-- Activity Timeline Card -->
-                    <div class="card info-card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-history mr-2 text-primary"></i>
-                                Riwayat Aktivitas
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="action-timeline">
-                                <div class="timeline-item">
-                                    <h6 class="mb-1">Transaksi Dibuat</h6>
-                                    <p class="text-muted mb-1">
-                                        <i class="far fa-calendar mr-1"></i>
-                                        {{ $transaction->created_at->format('d M Y H:i') }}
-                                    </p>
-                                </div>
+                            <hr>
+
+                            <div class="d-grid gap-2">
+                                <a href="{{ route('admin.tariktunai.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left mr-1"></i> Kembali
+                                </a>
                                 
-                                @if($transaction->petugas)
-                                <div class="timeline-item">
-                                    <h6 class="mb-1">Petugas Ditugaskan</h6>
-                                    <p class="text-muted mb-1">
-                                        <i class="fas fa-user-tag mr-1"></i>
-                                        {{ $transaction->petugas->name }}
-                                    </p>
-                                </div>
-                                @endif
-                                
-                                @if($transaction->waktu_diserahkan)
-                                <div class="timeline-item">
-                                    <h6 class="mb-1">Transaksi Selesai</h6>
-                                    <p class="text-muted mb-1">
-                                        <i class="far fa-check-circle mr-1"></i>
-                                        {{ $transaction->waktu_diserahkan->format('d M Y H:i') }}
-                                    </p>
-                                </div>
-                                @endif
-                                
-                                @if($transaction->catatan_admin)
-                                <div class="timeline-item">
-                                    <h6 class="mb-1">Catatan Admin</h6>
-                                    <p class="text-muted mb-1">
-                                        <i class="far fa-sticky-note mr-1"></i>
-                                        {{ Str::limit($transaction->catatan_admin, 50) }}
-                                    </p>
-                                </div>
-                                @endif
+                                <form action="{{ route('admin.tariktunai.destroy', $tarikTunai->id) }}" 
+                                      method="POST" 
+                                      onsubmit="return confirm('Hapus transaksi ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-block">
+                                        <i class="fas fa-trash mr-1"></i> Hapus Transaksi
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Information Card -->
-                    <div class="card info-card">
+                    <!-- Bukti Transfer Customer -->
+                    @if($tarikTunai->bukti_bayar_customer && !$tarikTunai->isQRISCOD())
+                    <div class="card card-outline card-success mb-4">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-exclamation-circle mr-2 text-primary"></i>
-                                Informasi Penting
+                                <i class="fas fa-file-invoice-dollar mr-2"></i>
+                                Bukti Bayar Customer
+                            </h3>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="{{ Storage::url($tarikTunai->bukti_bayar_customer) }}" 
+                                 alt="Bukti Bayar" 
+                                 class="img-fluid rounded shadow-sm mb-2"
+                                 style="max-height: 200px;">
+                            <br>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt mr-1"></i>
+                                {{ $tarikTunai->waktu_upload_bukti_customer->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}
+                            </small>
+                            <br>
+                            <a href="{{ Storage::url($tarikTunai->bukti_bayar_customer) }}" 
+                               target="_blank" 
+                               class="btn btn-sm btn-outline-primary mt-2">
+                                <i class="fas fa-expand mr-1"></i> Lihat Full Size
+                            </a>
+                            
+                            <!-- Form verifikasi untuk non-QRIS -->
+                            @if($tarikTunai->status == 'menunggu_verifikasi_admin')
+                            <div class="mt-3">
+                                <form action="{{ route('admin.tariktunai.verifikasi-bukti', $tarikTunai->id) }}" method="POST">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label>Verifikasi Bukti:</label>
+                                        <select name="status_verifikasi" class="form-control" required>
+                                            <option value="">-- Pilih --</option>
+                                            <option value="diterima">Terima</option>
+                                            <option value="ditolak">Tolak</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Catatan Verifikasi:</label>
+                                        <textarea name="catatan_verifikasi" class="form-control" rows="2" 
+                                                  placeholder="Berikan alasan..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-info btn-block">
+                                        <i class="fas fa-check mr-1"></i> Verifikasi
+                                    </button>
+                                </form>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    
+                    <!-- Info QRIS COD -->
+                    @if($tarikTunai->isQRISCOD())
+                    <div class="card card-outline card-orange">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-qrcode mr-2"></i>
+                                Informasi QRIS COD
                             </h3>
                         </div>
                         <div class="card-body">
-                            <ul class="list-unstyled">
-                                <li class="mb-2">
-                                    <i class="fas fa-check text-success mr-2"></i>
-                                    <strong>Transaksi Aman:</strong> Sistem sudah terverifikasi
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-shield-alt text-warning mr-2"></i>
-                                    <strong>Data Terenkripsi:</strong> Semua data dilindungi
-                                </li>
-                                <li class="mb-2">
-                                    <i class="fas fa-history text-info mr-2"></i>
-                                    <strong>Riwayat Lengkap:</strong> Semua aktivitas tercatat
-                                </li>
-                                <li class="mb-0">
-                                    <i class="fas fa-user-check text-primary mr-2"></i>
-                                    <strong>Petugas Terverifikasi:</strong> Semua petugas telah diverifikasi
-                                </li>
-                            </ul>
+                            <div class="alert alert-orange">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <strong>Perhatian!</strong> Transaksi ini menggunakan QRIS COD. 
+                                Proses pembayaran dilakukan saat serah terima.
+                            </div>
+                            
+                            @if($tarikTunai->status == 'menunggu_verifikasi_qris')
+                            <div class="alert alert-warning">
+                                <i class="fas fa-clock mr-2"></i>
+                                <strong>Menunggu Verifikasi QRIS</strong><br>
+                                Customer telah membayar via QRIS. Tunggu bukti pembayaran dari petugas.
+                            </div>
+                            @endif
+                            
+                            @if($tarikTunai->waktu_verifikasi_qris)
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <strong>QRIS Telah Diverifikasi</strong><br>
+                                Tanggal: {{ $tarikTunai->waktu_verifikasi_qris->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}
+                            </div>
+                            @endif
                         </div>
                     </div>
+                    @endif
                 </div>
-            </div>
-        </div>
-    </section>
-</div>
-
-<!-- Modals -->
-
-<!-- Assign Petugas Modal -->
-<div class="modal fade" id="assignModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-user-tag mr-2"></i>
-                    Assign Petugas
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <form action="{{ route('admin.tariktunai.assign-petugas', $transaction->id) }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="modal_petugas_id">Pilih Petugas</label>
-                        <select name="petugas_id" id="modal_petugas_id" class="form-control" required>
-                            <option value="">-- Pilih Petugas --</option>
-                            @foreach($petugasList as $petugas)
-                                <option value="{{ $petugas->id }}">{{ $petugas->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-info">Assign</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Complete Transaction Modal -->
-<div class="modal fade" id="completeModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    Tandai Sebagai Selesai
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <form action="{{ route('admin.tariktunai.update', $transaction->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="status" value="selesai">
-                <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        Pastikan petugas sudah menyerahkan uang tunai ke customer sebelum menandai selesai.
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="bukti_serah_terima_petugas">Upload Bukti Serah Terima (Opsional)</label>
-                        <input type="file" 
-                               class="form-control-file" 
-                               id="bukti_serah_terima_petugas" 
-                               name="bukti_serah_terima_petugas"
-                               accept="image/*">
-                        <small class="text-muted">Format: JPG, JPEG, PNG | Maks: 2MB</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="waktu_diserahkan">Waktu Diserahkan</label>
-                        <input type="datetime-local" 
-                               name="waktu_diserahkan" 
-                               id="waktu_diserahkan"
-                               class="form-control"
-                               value="{{ now()->format('Y-m-d\TH:i') }}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="complete_catatan">Catatan</label>
-                        <textarea name="catatan_admin" 
-                                  id="complete_catatan" 
-                                  class="form-control" 
-                                  rows="3"
-                                  placeholder="Tambahkan catatan penyelesaian transaksi..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Tandai Selesai</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Cancel Transaction Modal -->
-<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-times-circle mr-2"></i>
-                    Batalkan Transaksi
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <form action="{{ route('admin.tariktunai.update', $transaction->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="status" value="dibatalkan">
-                <div class="modal-body">
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        <strong>PERHATIAN!</strong> Transaksi yang dibatalkan tidak dapat dikembalikan.
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="cancel_reason">Alasan Pembatalan <span class="text-danger">*</span></label>
-                        <textarea name="catatan_admin" 
-                                  id="cancel_reason" 
-                                  class="form-control" 
-                                  rows="4"
-                                  placeholder="Jelaskan alasan pembatalan transaksi..."
-                                  required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger">Ya, Batalkan Transaksi</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-trash-alt mr-2"></i>
-                    Hapus Transaksi
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <form action="{{ route('admin.tariktunai.destroy', $transaction->id) }}" method="POST">
-                @csrf
-                @method('DELETE')
-                <div class="modal-body text-center">
-                    <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
-                    <h4>Apakah Anda yakin?</h4>
-                    <p class="text-muted">
-                        Transaksi #{{ $transaction->id }} akan dihapus permanen. 
-                        Data tidak dapat dikembalikan!
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tidak, Kembali</button>
-                    <button type="submit" class="btn btn-danger">Ya, Hapus Permanen</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Image Preview Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalTitle">Preview Gambar</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Preview" class="img-fluid">
             </div>
         </div>
     </div>
 </div>
 @endsection
 
+@section('css')
+<style>
+    .card-outline {
+        border-top: 4px solid;
+        border-radius: 12px;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    }
+
+    .card-outline.card-primary { border-top-color: #667eea; }
+    .card-outline.card-info { border-top-color: #4facfe; }
+    .card-outline.card-success { border-top-color: #43e97b; }
+    .card-outline.card-orange { border-top-color: #ff9500; }
+
+    .info-item label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .avatar-placeholder {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Timeline Styles */
+    .timeline {
+        position: relative;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 25px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        z-index: 1;
+    }
+
+    .timeline-step {
+        position: relative;
+        z-index: 2;
+    }
+
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #6c757d;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+    }
+
+    .step-circle.completed {
+        background: linear-gradient(135deg, #43e97b, #38f9d7);
+        border-color: #43e97b;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .step-circle.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-color: #667eea;
+        color: white;
+        transform: scale(1.1);
+        animation: pulse 2s infinite;
+    }
+
+    .step-circle.pending {
+        background: #fff;
+        border-color: #dee2e6;
+        color: #6c757d;
+    }
+
+    .step-label {
+        font-size: 12px;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1.1); }
+        50% { transform: scale(1.2); }
+    }
+
+    /* Badge Styles */
+    .badge-purple {
+        background: linear-gradient(135deg, #8a2be2, #da70d6);
+        color: white;
+    }
+    
+    .badge-orange {
+        background: linear-gradient(135deg, #ff9500, #ff5e3a);
+        color: white;
+    }
+    
+    .badge-secondary { background-color: #6c757d; }
+    .badge-warning { background-color: #ffc107; color: #212529; }
+    .badge-info { background-color: #17a2b8; }
+    .badge-primary { background-color: #007bff; }
+    .badge-blue { background-color: #007bff; }
+    .badge-teal { background-color: #20c997; }
+    .badge-success { background-color: #28a745; }
+    .badge-danger { background-color: #dc3545; }
+    .badge-dark { background-color: #343a40; }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .alert-orange {
+        background-color: rgba(255, 149, 0, 0.1);
+        border-color: #ff9500;
+        color: #cc7700;
+    }
+
+    @media (max-width: 768px) {
+        .timeline::before {
+            display: none;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            font-size: 14px;
+        }
+    }
+</style>
+@endsection
+
 @section('js')
 <script>
-$(document).ready(function() {
-    // Image Modal
-    $('#imageModal').on('show.bs.modal', function(event) {
-        const button = $(event.relatedTarget);
-        const imageSrc = button.data('image');
-        const imageTitle = button.data('title');
-        
-        const modal = $(this);
-        modal.find('#modalImage').attr('src', imageSrc);
-        modal.find('#imageModalTitle').text(imageTitle);
-    });
-    
-    // Set current datetime for completion modal
-    $('#waktu_diserahkan').val(new Date().toISOString().slice(0, 16));
-    
-    // Status change confirmation
-    $('#status').change(function() {
-        const newStatus = $(this).val();
-        const currentStatus = '{{ $transaction->status }}';
-        
-        if (newStatus === 'dibatalkan') {
-            if (!confirm('Apakah Anda yakin ingin membatalkan transaksi ini?')) {
-                $(this).val(currentStatus);
-                return false;
+    $(document).ready(function() {
+        // Status update confirmation
+        $('form').on('submit', function(e) {
+            const form = $(this);
+            if (form.find('select[name="status"]').length > 0) {
+                const newStatus = form.find('select[name="status"]').val();
+                const currentStatus = "{{ $tarikTunai->status }}";
+                
+                if (newStatus !== currentStatus && newStatus === 'dibatalkan') {
+                    if (!confirm('Anda yakin ingin membatalkan transaksi ini?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+                
+                // Validasi khusus untuk QRIS COD
+                @if($tarikTunai->isQRISCOD())
+                if (newStatus === 'selesai' && currentStatus !== 'menunggu_verifikasi_qris') {
+                    alert('Transaksi QRIS COD harus melalui verifikasi QRIS terlebih dahulu!');
+                    e.preventDefault();
+                    return false;
+                }
+                @endif
             }
-        }
+            return true;
+        });
+        
+        // Show/hide bukti QRIS field
+        $('select[name="status"]').change(function() {
+            const selectedStatus = $(this).val();
+            @if($tarikTunai->isQRISCOD())
+            if (selectedStatus === 'menunggu_verifikasi_qris') {
+                $('input[name="bukti_qris"]').closest('.form-group').show();
+            } else {
+                $('input[name="bukti_qris"]').closest('.form-group').hide();
+            }
+            @endif
+        }).trigger('change');
     });
-});
 </script>
 @endsection

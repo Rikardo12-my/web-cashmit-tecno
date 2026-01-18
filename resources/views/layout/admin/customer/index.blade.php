@@ -10,7 +10,7 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0 text-dark">
-                        <i class="fas fa-users mr-2"></i>👥 Manajemen Customer
+                        <i class="fas fa-users mr-2"></i>Manajemen Customer
                     </h1>
                 </div>
                 <div class="col-sm-6">
@@ -26,57 +26,6 @@
     <!-- Main Content -->
     <div class="content">
         <div class="container-fluid">
-            <!-- Stats Cards -->
-            <div class="row">
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-cyan">
-                        <div class="inner">
-                            <h3>{{ $totalCustomers }}</h3>
-                            <p>Total Customer</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Lihat semua <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-success">
-                        <div class="inner">
-                            <h3>{{ $activeCustomers }}</h3>
-                            <p>Customer Aktif</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-warning">
-                        <div class="inner">
-                            <h3>{{ $verifyCustomers }}</h3>
-                            <p>Menunggu Verifikasi</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-user-clock"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-gradient-danger">
-                        <div class="inner">
-                            <h3>{{ $bannedCustomers }}</h3>
-                            <p>Customer Diblokir</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-user-slash"></i>
-                        </div>
-                        <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-            </div>
 
             <!-- Main Content Row -->
             <div class="row">
@@ -299,50 +248,38 @@
                     </div>
 
                     <!-- Quick Actions -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-gradient-info">
-                                    <i class="fas fa-trash-restore"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Customer Terhapus</span>
-                                    <span class="info-box-number">{{ $deletedCount ?? 0 }}</span>
-                                    <a href="{{ route('admin.customer.deleted') }}" class="small-box-footer">
-                                        Lihat semua <i class="fas fa-arrow-circle-right"></i>
-                                    </a>
-                                </div>
-                            </div>
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-md-flex align-items-center justify-content-between">
+                    <!-- Deleted Customers Info -->
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <div class="bg-gradient-info rounded-circle p-3 me-4">
+                            <i class="fas fa-trash-restore text-white fa-lg"></i>
                         </div>
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-gradient-warning">
-                                    <i class="fas fa-chart-bar"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Statistik</span>
-                                    <span class="info-box-number">Lihat Analitik</span>
-                                    <a href="{{ route('admin.customer.statistics') }}" class="small-box-footer">
-                                        Lihat statistik <i class="fas fa-arrow-circle-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-gradient-success">
-                                    <i class="fas fa-file-export"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Export Data</span>
-                                    <span class="info-box-number">PDF/Excel</span>
-                                    <button class="small-box-footer" id="exportBtn">
-                                        Export sekarang <i class="fas fa-arrow-circle-right"></i>
-                                    </button>
-                                </div>
+                        <div>
+                            <h6 class="mb-1 font-weight-semibold">Customer Terhapus</h6>
+                            <div class="d-flex align-items-center">
+                                <span class="h4 mb-0 me-3">{{ $deletedCount ?? 0 }}</span>
+                                <span class="text-muted small">data customer telah dihapus</span>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Action Button -->
+                    <div>
+                        <a href="{{ route('admin.customer.deleted') }}" 
+                           class="btn btn-outline-info btn-icon">
+                            <i class="fas fa-eye me-2"></i>
+                            Lihat Arsip
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                 </div>
             </div>
         </div>
