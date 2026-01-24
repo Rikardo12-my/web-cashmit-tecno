@@ -13,7 +13,7 @@
                 </h1>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item active">Pembayaran</li>
                     </ol>
                 </div>
@@ -259,11 +259,6 @@
                                                             <i class="fas fa-university mr-1"></i> Bank/QRIS
                                                         </span>
                                                         @break
-                                                    @case('qris_cod')
-                                                        <span class="badge bg-success">
-                                                            <i class="fas fa-qrcode mr-1"></i> QRIS COD
-                                                        </span>
-                                                        @break
                                                     @case('e_wallet')
                                                         <span class="badge bg-warning">
                                                             <i class="fas fa-wallet mr-1"></i> E-Wallet
@@ -403,12 +398,6 @@
                                         'label' => 'Bank/QRIS',
                                         'color' => 'primary',
                                         'icon' => 'fa-university'
-                                    ],
-                                    'qris_cod' => [
-                                        'count' => $payments->where('kategori', 'qris_cod')->count(),
-                                        'label' => 'QRIS COD',
-                                        'color' => 'success',
-                                        'icon' => 'fa-qrcode'
                                     ],
                                     'e_wallet' => [
                                         'count' => $payments->where('kategori', 'e_wallet')->count(),
@@ -1192,8 +1181,6 @@ $(document).ready(function() {
         let modalTitle = '';
         if (kategori === 'e_wallet') {
             modalTitle = 'Logo E-Wallet';
-        } else if (kategori === 'qris_cod') {
-            modalTitle = 'QRIS COD';
         } else {
             modalTitle = 'QRIS';
         }

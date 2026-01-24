@@ -15,7 +15,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fas fa-home"></i> Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.tariktunai.index') }}"><i class="fas fa-money-bill-wave"></i> Tarik Tunai</a></li>
                         <li class="breadcrumb-item active">Set Biaya Admin</li>
                     </ol>

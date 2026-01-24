@@ -33,7 +33,7 @@ class VerificationController extends Controller
         }
         $verify->update(['status' => 'valid']);
         User::find($verify->user_id)->update(['status' => 'active']);
-        return redirect('/customer');
+        return redirect('/customer/tariktunai');
     }
 
     public function store(Request $request)

@@ -11,7 +11,7 @@ class DashboardController extends Controller
     public function index()
     {
         // Dashboard umum/admin
-        return view('dashboard');
+        return view('layout/admin/dashboard');
     }
     
     public function customerDashboard() 

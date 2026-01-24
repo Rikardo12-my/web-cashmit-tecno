@@ -8,14 +8,22 @@ use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\TarikTunaiController;
 use App\Http\Controllers\CustomerTarikTunaiController;
+use App\Http\Controllers\CustomerHistoryTarikTunaiController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\PetugasTarikTunaiController;
 use App\Http\Controllers\CustomerProfileController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminTarikTunaiController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\PetugasHistoryTarikTunaiController;
 
+// Landing page route
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing');
+})->name('landing');
+
+Route::get('/home', function () {
+    return redirect()->route('landing');
 });
 
 //untuk login
@@ -40,7 +48,7 @@ Route::group(['middleware' => ['auth', 'check_role:customer']], function () {
 
 // Admin Routes dengan middleware check_role:admin
 Route::group(['middleware' => ['auth', 'check_role:admin']], function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     // Redirect customers to admin/users/customers
     Route::redirect('/customers', '/admin/users/customers')->name('customers');
 
@@ -148,6 +156,9 @@ Route::group(['middleware' => ['auth', 'check_role:petugas']], function () {
     Route::get('/{tarikTunai}/location-detail', [PetugasTarikTunaiController::class, 'getLocationDetail'])->name('location-detail');
     Route::get('/{tarikTunai}/download-qris', [PetugasTarikTunaiController::class, 'downloadQris'])->name('download-qris');
 });
+Route::prefix('petugas/history')->name('petugas.history.')->group(function () {
+    Route::get('/', [PetugasHistoryTarikTunaiController::class, 'index'])->name('index');
+});
 });
 
 //route yang hanya bisa diakses oleh customer
@@ -173,8 +184,13 @@ Route::group(['middleware' => ['auth', 'check_role:customer', 'check_status']], 
         Route::post('/hapus-foto', [CustomerProfileController::class, 'hapusFoto'])->name('hapus-foto');
         Route::post('/update-password', [CustomerProfileController::class, 'updatePassword'])->name('update-password');
     });
+    Route::prefix('history')->name('history.')->group(function () {
+        // Main history page
+        Route::get('/', [CustomerHistoryTarikTunaiController::class, 'index'])->name('index');
+    });
 });
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout.post');
 });

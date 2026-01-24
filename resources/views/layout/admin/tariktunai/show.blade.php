@@ -20,7 +20,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fas fa-home"></i> Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.tariktunai.index') }}"><i class="fas fa-money-bill-wave"></i> Tarik Tunai</a></li>
                         <li class="breadcrumb-item active"><i class="fas fa-eye"></i> Detail</li>
                     </ol>
@@ -159,39 +159,99 @@
                                 </div>
                             </div>
 
-                            <!-- Status Timeline -->
-                            <div class="info-item mb-4">
-                                <label class="text-muted d-block mb-3">
-                                    <i class="fas fa-history mr-2"></i>Timeline Status
-                                </label>
-                                <div class="timeline">
-                                    @php
-                                        // Gunakan custom attributes dari model
-                                        $timelineSteps = $tarikTunai->timelineSteps;
-                                        $currentStep = $tarikTunai->currentStep;
-                                    @endphp
-                                    
-                                    <div class="d-flex justify-content-between position-relative">
-                                        @foreach($timelineSteps as $label => $time)
-                                            @if($time || $loop->first || $loop->last || $loop->index < $currentStep)
-                                            <div class="text-center" style="flex: 1;">
-                                                <div class="timeline-step mb-2">
-                                                    <div class="step-circle {{ $loop->index < $currentStep ? 'completed' : ($loop->index == $currentStep ? 'active' : 'pending') }}">
-                                                        {{ $loop->iteration }}
-                                                    </div>
-                                                    <div class="step-label mt-2">
-                                                        <small class="d-block text-muted">{{ $label }}</small>
-                                                        @if($time)
-                                                        <small class="text-success">{{ $time->timezone('Asia/Jakarta')->format('d/m/ H:i') }}</small>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Status Timeline Horizontal -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-history mr-2"></i>Proses Transaksi
+        </h3>
+    </div>
+    <div class="card-body">
+        @php
+            $timelineSteps = $tarikTunai->timelineSteps;
+            $currentStep = $tarikTunai->currentStep;
+            $totalSteps = count($timelineSteps);
+        @endphp
+        
+        @if($totalSteps > 0)
+        <!-- Progress Bar -->
+        <div class="progress mb-4" style="height: 8px;">
+            <div class="progress-bar bg-success" 
+                 role="progressbar" 
+                 style="width: {{ ($currentStep / $totalSteps) * 100 }}%"
+                 aria-valuenow="{{ $currentStep }}" 
+                 aria-valuemin="0" 
+                 aria-valuemax="{{ $totalSteps }}">
+            </div>
+        </div>
+
+        <!-- Timeline Steps -->
+        <div class="row text-center">
+            @foreach($timelineSteps as $label => $time)
+            <div class="col position-relative">
+                <!-- Connector Line -->
+                @if(!$loop->first)
+                <div class="timeline-connector" style="left: -50%;"></div>
+                @endif
+                
+                <!-- Step Circle -->
+                <div class="step-circle mx-auto mb-2 
+                    {{ $loop->index < $currentStep ? 'bg-success text-white' : 
+                       ($loop->index == $currentStep ? 'bg-primary text-white border-primary' : 
+                       'bg-light text-muted border-secondary') }}">
+                    @if($loop->index < $currentStep)
+                    <i class="fas fa-check"></i>
+                    @else
+                    {{ $loop->iteration }}
+                    @endif
+                </div>
+                
+                <!-- Step Info -->
+                <div class="step-info">
+                    <small class="d-block fw-bold">{{ $label }}</small>
+                    @if($time)
+                    <small class="text-muted d-block">
+                        {{ $time->timezone('Asia/Jakarta')->format('d/m H:i') }}
+                    </small>
+                    @else
+                    <small class="text-muted d-block">-</small>
+                    @endif
+                    
+                    @if($tarikTunai->is_qris_cod && $label == 'Verifikasi QRIS')
+                    <span class="badge bg-orange mt-1">
+                        <i class="fas fa-qrcode"></i>
+                    </span>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <!-- Current Status -->
+        <div class="alert alert-info mt-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-info-circle fa-lg me-3"></i>
+                <div>
+                    <strong>Status Saat Ini:</strong>
+                    <span class="badge bg-{{ $statusColors[$tarikTunai->status] ?? 'secondary' }} ms-2">
+                        {{ $tarikTunai->status_label ?? ucfirst(str_replace('_', ' ', $tarikTunai->status)) }}
+                    </span>
+                    <div class="mt-1">
+                        <small>Step {{ $currentStep }} dari {{ $totalSteps }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @else
+        <div class="text-center py-4">
+            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Belum ada timeline tersedia</p>
+        </div>
+        @endif
+    </div>
+</div>
+
+
 
                             <!-- Catatan -->
                             <div class="row">
@@ -397,9 +457,6 @@
                             <hr>
 
                             <div class="d-grid gap-2">
-                                <a href="{{ route('admin.tariktunai.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left mr-1"></i> Kembali
-                                </a>
                                 
                                 <form action="{{ route('admin.tariktunai.destroy', $tarikTunai->id) }}" 
                                       method="POST" 
@@ -647,6 +704,48 @@
             font-size: 14px;
         }
     }
+    .step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border: 3px solid;
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-connector {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    height: 3px;
+    background-color: #dee2e6;
+    z-index: 1;
+}
+
+.step-info {
+    min-height: 70px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .step-circle {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+    
+    .step-info small {
+        font-size: 11px;
+    }
+    
+    .timeline-connector {
+        top: 15px;
+    }
+}
 </style>
 @endsection
 

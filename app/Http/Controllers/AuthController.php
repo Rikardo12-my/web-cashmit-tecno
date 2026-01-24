@@ -18,9 +18,9 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
         if(Auth::attempt($request->only('email', 'password'),$request->remember)){
-            if(Auth::user()->role == 'petugas')return redirect('petugas/dashboard');
-            if(Auth::user()->role =='customer')return redirect('customer/dashboard');
-                return redirect('/dashboard');
+            if(Auth::user()->role == 'petugas')return redirect('petugas/tariktunai');
+            if(Auth::user()->role =='customer')return redirect('customer/tariktunai');
+                return redirect('admin/dashboard');
             }
             return back()->with('failed','Login gagal, silahkan periksa kembali email dan password anda!');
     }

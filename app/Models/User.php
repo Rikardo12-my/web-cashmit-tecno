@@ -56,7 +56,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    /**
-     * Get the notifications for the user.
-     */
+    public function transaksiSebagaiPetugas()
+{
+    return $this->hasMany(TarikTunai::class, 'petugas_id');
+}
+
+public function transaksiSebagaiCustomer()
+{
+    return $this->hasMany(TarikTunai::class, 'user_id');
+}
 }

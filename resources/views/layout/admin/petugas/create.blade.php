@@ -17,7 +17,7 @@
                             <h1 class="m-0 text-dark">Tambah Petugas Baru</h1>
                             <nav aria-label="breadcrumb" class="mt-2">
                                 <ol class="breadcrumb p-0 bg-transparent">
-                                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
                                     <li class="breadcrumb-item"><a href="{{ route('admin.petugas.index') }}">Petugas</a></li>
                                     <li class="breadcrumb-item active text-primary">Tambah Baru</li>
                                 </ol>

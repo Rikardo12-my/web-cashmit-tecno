@@ -15,7 +15,7 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"><i class="fas fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"><i class="fas fa-home"></i> Home</a></li>
                         <li class="breadcrumb-item active"><i class="fas fa-user-friends"></i> Customer</li>
                     </ol>
                 </div>
@@ -171,7 +171,7 @@
                                                     </small>
                                                     <small class="text-muted d-block">
                                                         <i class="far fa-clock mr-1"></i>
-                                                        {{ $customer->created_at->format('H:i') }}
+                                                        {{ $customer->created_at->timezone('Asia/Jakarta')->format('H:i') }}
                                                     </small>
                                                 </div>
                                             </td>

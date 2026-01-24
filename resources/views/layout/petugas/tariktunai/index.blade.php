@@ -4,56 +4,6 @@
 
 @section('content')
 <div class="container-fluid">
-    <!-- Header Stats -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <h3>{{ $stats['total'] ?? 0 }}</h3>
-                    <p>Total Tugas</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-tasks"></i>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>{{ ($stats['diproses'] ?? 0) + ($stats['dalam_perjalanan'] ?? 0) }}</h3>
-                    <p>Dalam Proses</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-sync-alt"></i>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="small-box bg-primary">
-                <div class="inner">
-                    <h3>{{ $stats['menunggu_serah_terima'] ?? 0 }}</h3>
-                    <p>Menunggu Serah Terima</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-user-clock"></i>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3>{{ $stats['selesai'] ?? 0 }}</h3>
-                    <p>Selesai</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Content -->
     <div class="row">
@@ -512,7 +462,7 @@ $(document).ready(function() {
         // Tampilkan modal
         $('#viewBuktiModal').modal('show');
     });
-
+    
     // SweetAlert for messages
     @if(session('success'))
         Swal.fire({
@@ -532,5 +482,6 @@ $(document).ready(function() {
         });
     @endif
 });
+
 </script>
 @endsection

@@ -198,27 +198,27 @@
                                     </button>
                                 @endif
                                 
-                                <!-- Upload Bukti Button -->
-                                @if($tarikTunai->biaya_admin > 0 && $tarikTunai->status == 'menunggu_pembayaran')
-                                    <button type="button" 
-                                            class="btn btn-success ml-2"
-                                            data-toggle="modal" 
-                                            data-target="#uploadModal">
-                                        <i class="fas fa-upload mr-1"></i> Upload Bukti
-                                    </button>
-                                @endif
-                                
-                                <!-- Cancel Button -->
-                                @if(in_array($tarikTunai->status, ['menunggu_admin', 'menunggu_pembayaran']))
-                                    <button type="button" 
-                                            class="btn btn-danger ml-2"
-                                            data-toggle="modal" 
-                                            data-target="#cancelModal"
-                                            data-id="{{ $tarikTunai->id }}"
-                                            data-code="{{ $tarikTunai->kode_transaksi }}">
-                                        <i class="fas fa-times mr-1"></i> Batalkan
-                                    </button>
-                                @endif
+                                <!-- Tombol Upload Bukti -->
+@if($tarikTunai->biaya_admin > 0 && $tarikTunai->status == 'menunggu_pembayaran')
+    <button type="button" 
+            class="btn btn-success ml-2"
+            data-bs-toggle="modal" 
+            data-bs-target="#uploadModal">
+        <i class="fas fa-upload mr-1"></i> Upload Bukti
+    </button>
+@endif
+
+<!-- Tombol Cancel -->
+@if(in_array($tarikTunai->status, ['menunggu_admin', 'menunggu_pembayaran']))
+    <button type="button" 
+            class="btn btn-danger ml-2"
+            data-bs-toggle="modal" 
+            data-bs-target="#cancelModal"
+            data-id="{{ $tarikTunai->id }}"
+            data-code="{{ $tarikTunai->kode_transaksi }}">
+        <i class="fas fa-times mr-1"></i> Batalkan
+    </button>
+@endif
                             </div>
                         </div>
                     </div>

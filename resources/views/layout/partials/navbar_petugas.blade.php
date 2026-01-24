@@ -1,234 +1,116 @@
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-        <li class="nav-item d-none d-sm-inline-block">
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand-lg navbar-white navbar-light">
+    <div class="container-fluid">
+      <!-- Logo untuk Mobile -->
+      <a class="navbar-brand" href="#">
+        <img src="{{asset('adminlte/dist/img/LogoCashMit.png')}}" alt="CashMit" height="30">
+        <span class="ml-2 font-weight-bold text-primary">CashMit</span>
+      </a>
+      
+      <!-- Mobile Toggle Button -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+        <!-- Left Navbar Links -->
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
             <a href="{{ route('petugas.tariktunai.index') }}" class="nav-link {{ request()->routeIs('tariktunai.index') ? 'active' : '' }}">
-                <i class="fas fa-tasks mr-1"></i> Tugas
+              <i class="fas fa-tasks mr-2"></i> 
+              <span>Tugas</span>
+              @if(request()->routeIs('tariktunai.index'))
+                <span class="badge bg-primary ms-2">Active</span>
+              @endif
             </a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link {{ request()->routeIs('petugas/history.*') ? 'active' : '' }}">
-                <i class="fas fa-history mr-1"></i> History
-            </a>
-        </li>
-    </ul>
+          </li>
+          <li class="nav-item">
+    <a href="{{ route('petugas.history.index') }}" class="nav-link {{ request()->routeIs('petugas.history.*') ? 'active' : '' }}">
+        <i class="fas fa-history mr-2"></i> 
+        <span>History</span>
+    </a>
+</li>
+        </ul>
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-        <!-- Notifications Dropdown Menu -->
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-bell"></i>
-                <span class="badge badge-warning navbar-badge">2</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">2 Notifications</span>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-money-check text-primary mr-2"></i> Penarikan baru menunggu
-                    <span class="float-right text-muted text-sm">5 mins</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-user-clock text-info mr-2"></i> Customer menunggu verifikasi
-                    <span class="float-right text-muted text-sm">1 hour</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-            </div>
-        </li>
+        <!-- Right Navbar Links -->
+        <ul class="navbar-nav ms-auto">
 
-        <!-- User Dropdown Menu -->
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-user-circle fa-lg"></i>
-                <span class="ml-1">{{ Auth::user()->nama ?? 'Petugas' }}</span>
-                @if(Auth::user()->role === 'admin')
-                    <span class="badge badge-success ml-1">Admin</span>
-                @elseif(Auth::user()->role === 'supervisor')
-                    <span class="badge badge-info ml-1">Supervisor</span>
+          <!-- User Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
+              <div class="d-none d-md-flex flex-column align-items-end mr-2">
+                <span class="font-weight-bold text-dark">{{ Auth::user()->nama ?? 'Petugas' }}</span>
+                <small class="text-muted">
+                  @if(Auth::user()->role === 'admin')
+                    <span class="role-badge badge-admin">Admin</span>
+                  @elseif(Auth::user()->role === 'supervisor')
+                    <span class="role-badge badge-supervisor">Supervisor</span>
+                  @else
+                    <span class="role-badge badge-petugas">Petugas</span>
+                  @endif
+                </small>
+              </div>
+              <div class="position-relative">
+                @if(Auth::user()->foto)
+                  <img src="{{ asset('storage/' . Auth::user()->foto) }}" 
+                       class="rounded-circle user-avatar"
+                       alt="User Image">
                 @else
-                    <span class="badge badge-secondary ml-1">Petugas</span>
+                  <div class="rounded-circle user-avatar-placeholder">
+                    <i class="fas fa-user-tie text-white fa-2x"></i>
+                  </div>
                 @endif
+                <span class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white" style="width: 12px; height: 12px;"></span>
+              </div>
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <div class="dropdown-item text-center py-2">
-                    <div class="image mb-2">
-                        @if(Auth::user()->foto)
-                            <img src="{{ asset('storage/' . Auth::user()->foto) }}" 
-                                 class="img-circle elevation-2" 
-                                 alt="User Image"
-                                 style="width: 60px; height: 60px; object-fit: cover;">
-                        @else
-                            <div class="img-circle bg-warning elevation-2 d-flex align-items-center justify-content-center mx-auto" 
-                                 style="width: 60px; height: 60px;">
-                                <i class="fas fa-user-tie text-white fa-2x"></i>
-                            </div>
-                        @endif
-                    </div>
-                    <h5 class="mb-0">{{ Auth::user()->nama ?? 'Petugas' }}</h5>
-                    <div class="mb-2">
-                        @if(Auth::user()->role === 'admin')
-                            <span class="badge badge-success">Admin</span>
-                        @elseif(Auth::user()->role === 'supervisor')
-                            <span class="badge badge-info">Supervisor</span>
-                        @else
-                            <span class="badge badge-secondary">Petugas</span>
-                        @endif
-                    </div>
-                    <small class="text-muted">{{ Auth::user()->email ?? '' }}</small>
+            <div class="dropdown-menu dropdown-menu-end">
+              <!-- User Header -->
+              <div class="user-dropdown-header text-center">
+                @if(Auth::user()->foto)
+                  <img src="{{ asset('storage/' . Auth::user()->foto) }}" 
+                       class="rounded-circle user-avatar mb-3"
+                       alt="User Image">
+                @else
+                  <div class="rounded-circle user-avatar-placeholder mx-auto mb-3">
+                    <i class="fas fa-user-tie text-white fa-2x"></i>
+                  </div>
+                @endif
+                <h5 class="mb-1 font-weight-bold">{{ Auth::user()->nama ?? 'Petugas' }}</h5>
+                <div class="mb-2">
+                  @if(Auth::user()->role === 'admin')
+                    <span class="role-badge badge-admin">Administrator</span>
+                  @elseif(Auth::user()->role === 'supervisor')
+                    <span class="role-badge badge-supervisor">Supervisor</span>
+                  @else
+                    <span class="role-badge badge-petugas">Petugas</span>
+                  @endif
                 </div>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-user mr-2"></i> Profil
-                </a>
-                @if(Auth::user()->role === 'admin')
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-cog mr-2"></i> Pengaturan Sistem
-                    </a>
-                @else
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-cog mr-2"></i> Pengaturan Akun
-                    </a>
-                @endif
-                <div class="dropdown-divider"></div>
-                <a href="{{ route('logout') }}" class="dropdown-item"
-                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                    @csrf
-                </form>
+                <p class="text-muted small mb-0">{{ Auth::user()->email ?? '' }}</p>
+              </div>
+              
+              <div class="dropdown-divider"></div>
+              
+              <!-- Dropdown Items -->
+              
+              <div class="dropdown-divider"></div>
+              
+              <a href="{{ route('logout.post') }}" class="dropdown-item text-danger"
+                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+              </a>
+              <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+              </form>
             </div>
-        </li>
+          </li>
 
-        <!-- Mobile Toggle -->
-        <li class="nav-item">
+          <!-- Fullscreen Toggle -->
+          <li class="nav-item">
             <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                <i class="fas fa-expand-arrows-alt"></i>
+              <i class="fas fa-expand-arrows-alt"></i>
             </a>
-        </li>
-    </ul>
-</nav>
-
-<style>
-    /* Style yang sama dengan navbar customer */
-    .navbar-light .navbar-nav .nav-link.active {
-        background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
-        color: white !important;
-        border-radius: 20px;
-        padding: 6px 15px !important;
-        margin: 0 5px;
-        font-weight: 500;
-    }
-
-    .navbar-light .navbar-nav .nav-link:hover {
-        color: #FF9800 !important;
-    }
-
-    .navbar-badge {
-        font-size: 0.6rem;
-        padding: 2px 5px;
-        position: absolute;
-        top: 5px;
-        right: 5px;
-    }
-
-    .dropdown-menu-lg {
-        min-width: 300px;
-    }
-
-    .dropdown-item {
-        padding: 12px 20px;
-        font-size: 14px;
-        transition: all 0.2s ease;
-    }
-
-    .dropdown-item:hover {
-        background-color: #f8f9fa;
-        padding-left: 25px;
-    }
-
-    .dropdown-header {
-        font-weight: 600;
-        color: #495057;
-        background-color: #f8f9fa;
-        padding: 10px 20px;
-    }
-
-    .img-circle {
-        border-radius: 50%;
-        border: 2px solid #e9ecef;
-    }
-
-    .dropdown-item.text-center {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    }
-
-    .main-header {
-        border-bottom: 1px solid #dee2e6;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .nav-link > i {
-        font-size: 1.1em;
-    }
-
-    /* Style khusus untuk petugas */
-    .badge {
-        font-size: 0.7rem;
-        font-weight: 500;
-        padding: 0.25rem 0.5rem;
-    }
-    
-    .bg-warning {
-        background-color: #FF9800 !important;
-    }
-
-    @media (max-width: 767.98px) {
-        .navbar-nav .nav-link {
-            padding: 0.5rem 0.8rem;
-        }
-        
-        .d-none.d-sm-inline-block {
-            display: inline-block !important;
-        }
-        
-        .badge {
-            font-size: 0.6rem;
-        }
-    }
-</style>
-
-<script>
-    // Highlight active menu
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-        
-        navLinks.forEach(link => {
-            if (link.href === window.location.href) {
-                link.classList.add('active');
-            }
-        });
-        
-        // Update badge notifikasi
-        updateNotificationBadge();
-    });
-    
-    function updateNotificationBadge() {
-        // Anda bisa menambahkan logika untuk mengambil jumlah notifikasi dari API
-        // Contoh sederhana:
-        // fetch('/api/petugas/notifications/count')
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         const badge = document.querySelector('.navbar-badge');
-        //         if (badge && data.count > 0) {
-        //             badge.textContent = data.count;
-        //             badge.style.display = 'inline-block';
-        //         } else if (badge) {
-        //             badge.style.display = 'none';
-        //         }
-        //     });
-    }
-</script>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- /.navbar -->
